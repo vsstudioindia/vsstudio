@@ -59,7 +59,7 @@ export default function Statement() {
     >
       {/* Background image — img tag is the most reliable path in Next.js */}
       <img
-        src="/images/statement.jpg"
+        src="https://res.cloudinary.com/drn6x6hbd/image/upload/statement"
         alt=""
         aria-hidden="true"
         style={{

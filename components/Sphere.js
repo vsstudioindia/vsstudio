@@ -2,7 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const IMAGE_PATHS = Array.from({ length: 12 }, (_, i) => `/images/sphere${i + 1}.jpg`);
+const IMAGE_PATHS = [
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere1.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere2.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/sphere3.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere4.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere5.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere6.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465745/sphere7.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere8.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere9.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere10.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere11.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere12.jpg',
+];
 
 
 const R   = 280; /* sphere radius */
@@ -46,7 +59,13 @@ export default function Sphere() {
     const imgs = IMAGE_PATHS.map((src, i) => {
       const img = new Image();
       img.src = src;
-      img.onload = img.onerror = () => {
+      img.onload = () => {
+        console.log('Loaded successfully:', img.src);
+        done++;
+        if (done === IMAGE_PATHS.length) setLoaded(true);
+      };
+      img.onerror = () => {
+        console.log('FAILED to load:', img.src);
         done++;
         if (done === IMAGE_PATHS.length) setLoaded(true);
       };

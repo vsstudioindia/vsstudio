@@ -44,7 +44,7 @@ export default function Story() {
       >
         {/* Photo */}
         <img
-          src="/images/story.jpg"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/story"
           alt="VS Studio — The Philosophy"
           style={{
             display:    'block',

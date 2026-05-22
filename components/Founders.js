@@ -243,7 +243,7 @@ export default function Founders() {
       >
         {/* Banner photo with slow zoom */}
         <img
-          src="/images/founders-banner.jpg"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/founders-banner"
           alt="VS Studio Founders"
           style={{
             position:   'absolute',
@@ -401,7 +401,7 @@ export default function Founders() {
         }}
       >
         <FounderCard
-          src="/images/vrinda.jpg"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/vrinda"
           role="Co-Founder & Creative Director"
           name="Vrinda Ganeriwala"
           title="Photographer · Filmmaker · Canon Ambassador"
@@ -410,7 +410,7 @@ export default function Founders() {
           isLast={false}
         />
         <FounderCard
-          src="/images/shristi.jpg"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/shristi"
           role="Co-Founder & Director of Films"
           name="Shristi Dhandharia"
           title="Cinematographer · Editor · Storyteller"

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const FILMS = [
   {
-    src:     '/images/film1.jpg',
+    src:     'https://res.cloudinary.com/drn6x6hbd/image/upload/film1',
     caption: 'Pre-Wedding Film — Vietnam',
     title:   'Golden Bridge',
     href:    'https://youtu.be/SauwDq7GAuI',
@@ -12,7 +12,7 @@ const FILMS = [
     marginTop: 0,
   },
   {
-    src:     '/images/film2.jpg',
+    src:     'https://res.cloudinary.com/drn6x6hbd/image/upload/film2',
     caption: 'Pre-Wedding Film — Bangkok',
     title:   'Bangkok After Dark',
     href:    'https://youtu.be/rSeB8wjhEF8',
@@ -20,7 +20,7 @@ const FILMS = [
     marginTop: 72,
   },
   {
-    src:     '/images/film3.jpg',
+    src:     'https://res.cloudinary.com/drn6x6hbd/image/upload/film3',
     caption: 'Wedding Film — 2024',
     title:   'Golden Hour',
     href:    'https://youtu.be/Q0KLAqOCQKU',

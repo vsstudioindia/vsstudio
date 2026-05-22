@@ -8,9 +8,9 @@ const PAR_X = 16;
 const PAR_Y = 9;
 
 const IMAGES = [
-  '/images/hero1.jpg',
-  '/images/hero2.jpg',
-  '/images/hero3.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero1',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero2',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero3',
 ];
 
 export default function Hero() {

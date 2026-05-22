@@ -1,26 +1,139 @@
-@import "tailwindcss";
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Montserrat:wght@200;300;400;500&display=swap');
 
+/* ─── Design Tokens ────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --black:   #060606;
+  --black2:  #0d0d0d;
+  --emerald: #091c12;
+  --emerald2:#0d2b1f;
+  --gold:    #c9a84c;
+  --ivory:   #f0ead8;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Reset / Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--black);
+  color: var(--ivory);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 200;
+  cursor: none;          /* custom cursor replaces default */
+  overflow-x: hidden;
+}
+
+/* ─── Custom Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 2px; }
+::-webkit-scrollbar-track  { background: var(--black); }
+::-webkit-scrollbar-thumb  { background: var(--gold); border-radius: 1px; }
+
+/* ─── Custom Cursor ────────────────────────────────────────────────────────── */
+
+/* Small filled dot that snaps precisely to the pointer */
+#cur-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  will-change: transform;
+}
+
+/* Larger outline ring that lags behind the dot (lerp in JS) */
+#cur-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.2s ease, opacity 0.2s ease;
+  will-change: transform;
+  opacity: 0.7;
+}
+
+/* Hover state: ring expands, dot shrinks to a point */
+#cur-ring.hov  { width: 56px; height: 56px; opacity: 1; border-color: var(--gold); }
+#cur-dot.hov   { width: 4px;  height: 4px; }
+
+/* ─── Hero Section ─────────────────────────────────────────────────────────── */
+
+/* Outer container — hidden until .vis is added after curtain opens */
+.hero-con {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.9s ease 0.2s, transform 0.9s ease 0.2s;
+  position: relative;
+  z-index: 2;
+}
+.hero-con.vis {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Main headline — Cormorant Garamond, display size */
+.hero-h {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--ivory);
+}
+
+/* Small gold all-caps label above the headline */
+.hero-eyb {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* Subtitle / body copy */
+.hero-sub {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  font-weight: 200;
+  line-height: 1.9;
+  color: var(--ivory);
+  opacity: 0.75;
+  max-width: 440px;
+}
+
+/* Gold CTA button */
+.btn-primary {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--black);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85rem 2.2rem;
+  border: none;
+  cursor: none;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.btn-primary:hover {
+  background: var(--ivory);
+  transform: translateY(-2px);
 }

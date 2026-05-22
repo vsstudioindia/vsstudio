@@ -4,29 +4,51 @@ import { useEffect, useRef, useState } from 'react';
 
 function getVisibility(el) {
   if (!el) return 0;
-  const rect         = el.getBoundingClientRect();
-  const windowHeight = window.innerHeight;
-  const visibleTop    = Math.max(0, Math.min(rect.bottom, windowHeight));
-  const visibleBottom = Math.max(0, Math.min(windowHeight - rect.top, windowHeight));
+  const rect          = el.getBoundingClientRect();
+  const wh            = window.innerHeight;
+  const visibleTop    = Math.max(0, Math.min(rect.bottom, wh));
+  const visibleBottom = Math.max(0, Math.min(wh - rect.top, wh));
   const visibleHeight = Math.max(0, Math.min(visibleTop, visibleBottom));
-  return visibleHeight / windowHeight;
+  return visibleHeight / wh;
 }
 
 export default function Team() {
   const sectionRef     = useRef(null);
+  const containerRef   = useRef(null);
   const playerRef      = useRef(null);
   const volRef         = useRef(0);
-  const iframeId       = 'yt-team-bg';
-  const [isMuted,       setIsMuted]       = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [isMuted,       setIsMuted]       = useState(false);
 
-  /* ── YouTube IFrame API ─────────────────────────────────────────────────── */
+  /* ── Build player once on mount ────────────────────────────────────────── */
   useEffect(() => {
-    function initPlayer() {
-      playerRef.current = new window.YT.Player(iframeId, {
+    function createPlayer() {
+      /* Create the iframe div target */
+      const div = document.createElement('div');
+      div.id = 'yt-team-player';
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+        containerRef.current.appendChild(div);
+      }
+
+      playerRef.current = new window.YT.Player('yt-team-player', {
+        videoId: 'VCdjRpDou4c',
+        playerVars: {
+          autoplay:       1,
+          mute:           1,
+          loop:           1,
+          playlist:       'VCdjRpDou4c',
+          controls:       0,
+          showinfo:       0,
+          rel:            0,
+          modestbranding: 1,
+          enablejsapi:    1,
+          playsinline:    1,
+        },
+        width:  '100%',
+        height: '100%',
         events: {
           onReady(e) {
-            /* video starts muted via URL param; keep vol at 0 until interaction */
             e.target.setVolume(0);
             volRef.current = 0;
           },
@@ -34,86 +56,88 @@ export default function Team() {
       });
     }
 
-    if (window.YT && window.YT.Player) {
-      initPlayer();
-    } else {
+    function loadAPI() {
+      if (window.YT && window.YT.Player) {
+        createPlayer();
+        return;
+      }
+      /* Chain onto any existing ready callback */
       const prev = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
-        if (prev) prev();
-        initPlayer();
+        if (typeof prev === 'function') prev();
+        createPlayer();
       };
-      if (!document.getElementById('yt-api-script')) {
+      if (!window.ytApiLoading) {
+        window.ytApiLoading = true;
         const script = document.createElement('script');
-        script.id    = 'yt-api-script';
         script.src   = 'https://www.youtube.com/iframe_api';
         document.head.appendChild(script);
       }
     }
+
+    loadAPI();
+
+    return () => {
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+    };
   }, []);
 
-  /* ── Scroll-based volume (only after first interaction) ─────────────────── */
+  /* ── Scroll-based volume (only after interaction, only when unmuted) ────── */
   useEffect(() => {
+    if (!hasInteracted) return;
+
     function onScroll() {
-      if (!hasInteracted || isMuted) return;
+      if (isMuted) return;
+      const p = playerRef.current;
+      if (!p || typeof p.setVolume !== 'function') return;
       const visibility = getVisibility(sectionRef.current);
       const target     = Math.round(visibility * 100);
-      volRef.current   = volRef.current + (target - volRef.current) * 0.1;
-      const rounded    = Math.round(volRef.current);
-      const p          = playerRef.current;
-      if (p && typeof p.setVolume === 'function') p.setVolume(rounded);
+      volRef.current   = volRef.current + (target - volRef.current) * 0.15;
+      p.setVolume(Math.round(volRef.current));
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    onScroll(); /* seed immediately */
     return () => window.removeEventListener('scroll', onScroll);
   }, [hasInteracted, isMuted]);
 
-  /* ── First-click to enable sound ────────────────────────────────────────── */
-  function handleSectionClick() {
-    if (hasInteracted) return;
+  /* ── First interaction — unmute and hand off to scroll logic ────────────── */
+  function handleTapForSound() {
     const p = playerRef.current;
-    if (p && typeof p.unMute === 'function') {
-      p.unMute();
-      const vol = Math.round(getVisibility(sectionRef.current) * 100);
-      volRef.current = vol;
-      p.setVolume(vol);
-    }
+    if (!p || typeof p.unMute !== 'function') return;
+    p.unMute();
+    const vol = Math.round(getVisibility(sectionRef.current) * 100);
+    volRef.current = vol;
+    p.setVolume(vol);
     setHasInteracted(true);
     setIsMuted(false);
   }
 
-  /* ── Mute toggle (after interaction) ────────────────────────────────────── */
+  /* ── Mute toggle ─────────────────────────────────────────────────────────── */
   function handleMuteToggle(e) {
     e.stopPropagation();
-    if (!hasInteracted) {
-      handleSectionClick();
-      return;
-    }
     const p = playerRef.current;
-    if (!p || typeof p.setVolume !== 'function') return;
+    if (!p) return;
     if (isMuted) {
       p.unMute();
       const vol = Math.round(getVisibility(sectionRef.current) * 100);
       volRef.current = vol;
       p.setVolume(vol);
+      setIsMuted(false);
     } else {
       p.mute();
       p.setVolume(0);
+      setIsMuted(true);
     }
-    setIsMuted((m) => !m);
-  }
-
-  /* ── Button label ────────────────────────────────────────────────────────── */
-  function btnLabel() {
-    if (!hasInteracted) return '♪ CLICK FOR SOUND';
-    return isMuted ? '♪ MUTED' : '♪ SOUND ON';
   }
 
   return (
     <section
       id="team"
       ref={sectionRef}
-      onClick={handleSectionClick}
       style={{
         position:       'relative',
         height:         '100vh',
@@ -121,33 +145,19 @@ export default function Team() {
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
-        cursor:         hasInteracted ? 'none' : 'pointer',
       }}
     >
-      {/* ── Video background ──────────────────────────────────────────── */}
+      {/* ── Video container ───────────────────────────────────────────── */}
       <div
+        ref={containerRef}
         style={{
           position:      'absolute',
           inset:         0,
-          transform:     'scale(1.15)',
+          transform:     'scale(1.18)',
           pointerEvents: 'none',
+          zIndex:        0,
         }}
-      >
-        <iframe
-          id={iframeId}
-          src="https://www.youtube.com/embed/VCdjRpDou4c?autoplay=1&mute=1&loop=1&playlist=VCdjRpDou4c&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          style={{
-            position:      'absolute',
-            inset:         0,
-            width:         '100%',
-            height:        '100%',
-            border:        'none',
-            pointerEvents: 'none',
-          }}
-        />
-      </div>
+      />
 
       {/* ── Overlay ───────────────────────────────────────────────────── */}
       <div
@@ -223,35 +233,70 @@ export default function Team() {
         >
           500+ Weddings · 11 Countries · 55+ Awards
         </p>
+
+        {/* ── Tap for sound prompt ────────────────────────────────────── */}
+        {!hasInteracted && (
+          <button
+            className="hov"
+            onClick={handleTapForSound}
+            style={{
+              marginTop:     '52px',
+              display:       'inline-block',
+              background:    'transparent',
+              border:        '1px solid var(--gold)',
+              padding:       '16px 40px',
+              fontFamily:    "'Montserrat', sans-serif",
+              fontSize:      '11px',
+              fontWeight:    300,
+              letterSpacing: '0.4em',
+              textTransform: 'uppercase',
+              color:         'var(--gold)',
+              cursor:        'none',
+              transition:    'background 0.3s ease, color 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--gold)';
+              e.currentTarget.style.color      = 'var(--black)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color      = 'var(--gold)';
+            }}
+          >
+            ♪ TAP FOR SOUND
+          </button>
+        )}
       </div>
 
-      {/* ── Sound button ──────────────────────────────────────────────── */}
-      <button
-        className="hov"
-        onClick={handleMuteToggle}
-        style={{
-          position:      'absolute',
-          bottom:        '40px',
-          right:         '56px',
-          zIndex:        3,
-          background:    'transparent',
-          border:        '1px solid var(--gold)',
-          padding:       '10px 20px',
-          fontFamily:    "'Montserrat', sans-serif",
-          fontSize:      '9px',
-          fontWeight:    300,
-          letterSpacing: '0.35em',
-          textTransform: 'uppercase',
-          color:         'var(--gold)',
-          cursor:        'none',
-          transition:    'opacity 0.3s ease',
-          opacity:       hasInteracted ? 0.8 : 1,
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = hasInteracted ? '0.8' : '1')}
-      >
-        {btnLabel()}
-      </button>
+      {/* ── Mute toggle (visible only after interaction) ──────────────── */}
+      {hasInteracted && (
+        <button
+          className="hov"
+          onClick={handleMuteToggle}
+          style={{
+            position:      'absolute',
+            bottom:        '40px',
+            right:         '56px',
+            zIndex:        3,
+            background:    'transparent',
+            border:        '1px solid var(--gold)',
+            padding:       '10px 20px',
+            fontFamily:    "'Montserrat', sans-serif",
+            fontSize:      '9px',
+            fontWeight:    300,
+            letterSpacing: '0.35em',
+            textTransform: 'uppercase',
+            color:         'var(--gold)',
+            cursor:        'none',
+            opacity:       0.8,
+            transition:    'opacity 0.3s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}
+        >
+          {isMuted ? '♪ UNMUTE' : '♪ MUTE'}
+        </button>
+      )}
     </section>
   );
 }

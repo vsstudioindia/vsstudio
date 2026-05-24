@@ -6,9 +6,9 @@ import Intro     from '@/components/Intro';
 import Nav       from '@/components/Nav';
 import Hero      from '@/components/Hero';
 import Statement from '@/components/Statement';
-import Sphere    from '@/components/Sphere';
-import Films     from '@/components/Films';
-import Story     from '@/components/Story';
+import Sphere       from '@/components/Sphere';
+import RecordPlayer from '@/components/RecordPlayer';
+import Story        from '@/components/Story';
 import Founders  from '@/components/Founders';
 import Team      from '@/components/Team';
 import WhyUs     from '@/components/WhyUs';
@@ -31,7 +31,7 @@ export default function Home() {
             <Hero />
             <Statement />
             <Sphere />
-            <Films />
+            <RecordPlayer />
             <Story />
             <Founders />
             <Team />

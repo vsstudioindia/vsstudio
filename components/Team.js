@@ -164,7 +164,7 @@ export default function Team() {
         style={{
           position:   'absolute',
           inset:      0,
-          background: 'linear-gradient(180deg, rgba(6,6,6,0.3) 0%, rgba(9,28,18,0.75) 100%)',
+          background: 'linear-gradient(180deg, rgba(6,6,6,0.55) 0%, rgba(9,28,18,0.85) 100%)',
           zIndex:     1,
         }}
       />

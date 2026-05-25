@@ -57,25 +57,25 @@ export default function Statement() {
         overflow:       'hidden',
       }}
     >
-      {/* Background image — img tag is the most reliable path in Next.js */}
-      <img
-        src="https://res.cloudinary.com/drn6x6hbd/image/upload/statement"
-        alt=""
-        aria-hidden="true"
+      {/* Background video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
         style={{
-          position:   'absolute',
-          top:        0,
-          left:       0,
-          right:      0,
-          bottom:     0,
-          width:      '100%',
-          height:     '100%',
-          objectFit:  'cover',
+          position:       'absolute',
+          inset:          0,
+          width:          '100%',
+          height:         '100%',
+          objectFit:      'cover',
           objectPosition: 'center',
-          zIndex:     0,
-          display:    'block',
+          filter:         'brightness(0.35)',
+          zIndex:         0,
         }}
-      />
+      >
+        <source src="https://res.cloudinary.com/drn6x6hbd/video/upload/story" type="video/mp4" />
+      </video>
 
       {/* Dark overlay */}
       <div

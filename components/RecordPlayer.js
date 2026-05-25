@@ -51,14 +51,6 @@ const CARD_CONFIG = [
   { top: 168, left: 24,  anim: 'fc 6s   ease-in-out -2s   infinite' },
 ];
 
-/*
- * Tonearm geometry — SVG viewBox 230×440, rendered at width:200px (scale ≈ 0.87)
- * Pivot SVG (198,38) → screen (172px, 33px)
- * Stylus SVG (25,400) → relative to pivot: dx ≈ -150, dy ≈ 315
- * BASE_ANGLE = atan2(315, -150) ≈ 115.6°
- */
-const BASE_ANGLE = Math.atan2(315, -150) * (180 / Math.PI);
-
 /* ─────────────────────────────── AlbumCard ───────────────────────────────── */
 function AlbumCard({ couple, cfg, acColor, moodLabel, onClick }) {
   const [hov, setHov] = useState(false);
@@ -170,21 +162,15 @@ function Lightbox({ video, name, onClose }) {
 /* ─────────────────────────────── RecordPlayer ────────────────────────────── */
 export default function RecordPlayer() {
   const [activeMood,    setActiveMood]    = useState('cinematic');
-  const [armAngle,      setArmAngle]      = useState(-40);
-  const [isLocked,      setIsLocked]      = useState(false);
   const [isMuted,       setIsMuted]       = useState(false);
   const [lightboxVideo, setLightboxVideo] = useState(null);
   const [lightboxName,  setLightboxName]  = useState('');
 
-  const sectionRef        = useRef(null);
-  const audioRef          = useRef(null);
-  const isDraggingRef     = useRef(false);
-  const isLockedRef       = useRef(false);
-  const armAngleRef       = useRef(-40);
-  const pivotScreenPosRef = useRef({ x: 0, y: 0 });
-  const activeMoodRef     = useRef('cinematic');
-  const isMutedRef        = useRef(false);
-  const fadeRef           = useRef(null);
+  const sectionRef    = useRef(null);
+  const audioRef      = useRef(null);
+  const activeMoodRef = useRef('cinematic');
+  const isMutedRef    = useRef(false);
+  const fadeRef       = useRef(null);
 
   useEffect(() => { activeMoodRef.current = activeMood; }, [activeMood]);
 
@@ -257,74 +243,6 @@ export default function RecordPlayer() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  /* ── Pivot position ─────────────────────────────────────────────────────── */
-  function updatePivotPos() {
-    const sec = sectionRef.current;
-    if (!sec) return;
-    const rect = sec.getBoundingClientRect();
-    pivotScreenPosRef.current = {
-      x: rect.left + 488 + 172,
-      y: rect.top  + window.innerHeight * 0.08 + 33,
-    };
-  }
-
-  useEffect(() => {
-    updatePivotPos();
-    window.addEventListener('resize', updatePivotPos);
-    return () => window.removeEventListener('resize', updatePivotPos);
-  }, []);
-
-  /* ── Window mousemove + mouseup (tonearm visual only) ───────────────────── */
-  useEffect(() => {
-    function onMouseMove(e) {
-      if (!isDraggingRef.current) return;
-      const { x: px, y: py } = pivotScreenPosRef.current;
-      const raw     = Math.atan2(e.clientY - py, e.clientX - px) * (180 / Math.PI) - BASE_ANGLE;
-      const clamped = Math.max(-40, Math.min(-15, raw));
-      armAngleRef.current = clamped;
-      setArmAngle(clamped);
-    }
-
-    function onMouseUp() {
-      if (!isDraggingRef.current) return;
-      isDraggingRef.current = false;
-      if (armAngleRef.current >= -20) {
-        isLockedRef.current = true;
-        setIsLocked(true);
-        armAngleRef.current = -15;
-        setArmAngle(-15);
-      } else {
-        isLockedRef.current = false;
-        setIsLocked(false);
-        armAngleRef.current = -40;
-        setArmAngle(-40);
-      }
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup',   onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup',   onMouseUp);
-    };
-  }, []);
-
-  /* ── Section mousedown ──────────────────────────────────────────────────── */
-  function handleMouseDown(e) {
-    updatePivotPos();
-    const { x: px, y: py } = pivotScreenPosRef.current;
-    if (Math.hypot(e.clientX - px, e.clientY - py) > 80) return;
-
-    if (isLockedRef.current) {
-      isLockedRef.current = false;
-      setIsLocked(false);
-      armAngleRef.current = -40;
-      setArmAngle(-40);
-    } else {
-      isDraggingRef.current = true;
-    }
-  }
 
   /* ── Mood change — fade out → swap src → fade in ────────────────────────── */
   function handleMoodChange(key) {
@@ -411,20 +329,12 @@ export default function RecordPlayer() {
           0%, 100% { transform: translateY(0px)  rotate(-0.8deg); }
           50%      { transform: translateY(-15px) rotate(1.5deg);  }
         }
-        @keyframes stylusPulse {
-          0%, 100% { opacity: 0.75; }
-          50%      { opacity: 1;    }
-        }
-        @keyframes ringPulse {
-          0%, 100% { opacity: 0.3; }
-          50%      { opacity: 0.9; }
-        }
+
       `}</style>
 
       <section
         id="films"
         ref={sectionRef}
-        onMouseDown={handleMouseDown}
         style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#060808', '--ac': mood.ac }}
       >
         {/* ══ LEFT — VINYL STAGE ══════════════════════════════════════════ */}
@@ -489,61 +399,6 @@ export default function RecordPlayer() {
             borderRadius: '50%', zIndex: 5, pointerEvents: 'none',
             background: 'linear-gradient(125deg, rgba(255,255,255,0.06) 0%, transparent 38%, rgba(0,0,0,0.22) 100%)',
           }} />
-
-          {/* ── Tonearm (visual only) ─────────────────────────────────── */}
-          <svg
-            viewBox="0 0 230 440"
-            style={{
-              position:        'absolute',
-              top:             '8vh',
-              left:            '488px',
-              width:           '200px',
-              height:          'auto',
-              zIndex:          10,
-              pointerEvents:   'none',
-              transformOrigin: '172px 33px',
-              transform:       `rotate(${armAngle}deg)`,
-            }}
-          >
-            <defs>
-              <linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   stopColor="#ccc" />
-                <stop offset="50%"  stopColor="#666" />
-                <stop offset="100%" stopColor="#aaa" />
-              </linearGradient>
-              <radialGradient id="pg" cx="40%" cy="35%">
-                <stop offset="0%"   stopColor="#999" />
-                <stop offset="100%" stopColor="#222" />
-              </radialGradient>
-            </defs>
-
-            <line x1={198} y1={38} x2={222} y2={12} stroke="#888" strokeWidth={3} />
-            <circle cx={222} cy={12} r={7} fill="#3a3a3a" />
-            <line x1={198} y1={38} x2={28} y2={390} stroke="url(#ag)" strokeWidth={3.5} />
-            <circle cx={198} cy={38} r={20}  fill="url(#pg)" />
-            <circle cx={198} cy={38} r={14}  fill="#252525"  />
-            <circle cx={198} cy={38} r={9}   fill="#3a3a3a"  />
-            <circle cx={198} cy={38} r={5}   fill="#888"     />
-            <circle cx={198} cy={38} r={2.5} fill="#111"     />
-            <rect x={14} y={378} width={26} height={15} rx={3} fill="#4a4a4a" />
-            <rect
-              x={23} y={393} width={4} height={14} rx={2}
-              fill="#c9a84c"
-              style={{
-                opacity:   isLocked ? undefined : 0.45,
-                animation: isLocked ? 'stylusPulse 0.8s ease-in-out infinite' : 'none',
-                filter:    isLocked ? 'drop-shadow(0 0 6px #c9a84c)' : 'none',
-              }}
-            />
-            <circle
-              cx={25} cy={400} r={6}
-              fill="none" stroke="#c9a84c" strokeWidth={1.5}
-              style={{
-                opacity:   isLocked ? undefined : 0,
-                animation: isLocked ? 'ringPulse 0.8s ease-in-out infinite' : 'none',
-              }}
-            />
-          </svg>
 
           {/* Edge fades */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '110px', zIndex: 7, pointerEvents: 'none', background: 'linear-gradient(180deg, #060808 0%, transparent 100%)' }} />

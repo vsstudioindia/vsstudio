@@ -98,35 +98,13 @@ export default function Intro({ onComplete }) {
             opacity:    showLogo ? 1 : 0,
             transform:  showLogo ? 'translateY(0)' : 'translateY(16px)',
             transition: 'opacity 0.8s ease, transform 0.8s ease',
-            display:    'flex',
-            flexDirection:  'column',
-            alignItems:     'center',
-            gap:            '0.4rem',
           }}
         >
-          <span
-            style={{
-              fontFamily:    "'Cormorant Garamond', serif",
-              fontSize:      'clamp(2rem, 5vw, 4rem)',
-              fontWeight:    400,
-              letterSpacing: '0.18em',
-              color:         'var(--ivory)',
-            }}
-          >
-            VS
-          </span>
-          <span
-            style={{
-              fontFamily:    "'Montserrat', sans-serif",
-              fontSize:      '0.6rem',
-              fontWeight:    300,
-              letterSpacing: '0.45em',
-              textTransform: 'uppercase',
-              color:         'var(--gold)',
-            }}
-          >
-            Studio
-          </span>
+          <img
+            src="https://res.cloudinary.com/drn6x6hbd/image/upload/v1779744741/logo_reverse.png"
+            alt="VS Studio"
+            style={{ height: '64px', width: 'auto', display: 'block', margin: '0 auto' }}
+          />
         </div>
       </div>
 

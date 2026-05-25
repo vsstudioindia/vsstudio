@@ -46,21 +46,13 @@ export default function Nav() {
         }}
       />
 
-      {/* Left — logo wordmark */}
-      <a
-        href="#"
-        className="hov"
-        style={{
-          fontFamily:     "'Cormorant Garamond', serif",
-          fontSize:       '13px',
-          fontWeight:     400,
-          letterSpacing:  '0.42em',
-          textTransform:  'uppercase',
-          color:          'var(--gold)',
-          textDecoration: 'none',
-        }}
-      >
-        VS Studio
+      {/* Left — logo */}
+      <a href="#" className="hov" style={{ textDecoration: 'none', display: 'block' }}>
+        <img
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/v1779744741/logo_reverse.png"
+          alt="VS Studio"
+          style={{ height: '48px', width: 'auto', display: 'block' }}
+        />
       </a>
 
       {/* Center — navigation links */}

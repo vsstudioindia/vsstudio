@@ -11,6 +11,7 @@ import RecordPlayer from '@/components/RecordPlayer';
 import Story        from '@/components/Story';
 import Founders  from '@/components/Founders';
 import Canon     from '@/components/Canon';
+import Awards    from '@/components/Awards';
 import Team      from '@/components/Team';
 import WhyUs     from '@/components/WhyUs';
 import CTA       from '@/components/CTA';
@@ -36,6 +37,7 @@ export default function Home() {
             <Story />
             <Founders />
             <Canon />
+            <Awards />
             <Team />
             <WhyUs />
             <CTA />

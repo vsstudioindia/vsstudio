@@ -159,12 +159,22 @@ export default function Team() {
         }}
       />
 
-      {/* ── Overlay ───────────────────────────────────────────────────── */}
+      {/* ── Solid dark overlay ────────────────────────────────────────── */}
       <div
         style={{
           position:   'absolute',
           inset:      0,
-          background: 'linear-gradient(180deg, rgba(6,6,6,0.55) 0%, rgba(9,28,18,0.85) 100%)',
+          background: 'rgba(6,6,6,0.4)',
+          zIndex:     1,
+        }}
+      />
+
+      {/* ── Gradient overlay ──────────────────────────────────────────── */}
+      <div
+        style={{
+          position:   'absolute',
+          inset:      0,
+          background: 'linear-gradient(180deg, rgba(6,6,6,0.75) 0%, rgba(9,28,18,0.92) 100%)',
           zIndex:     1,
         }}
       />

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 /* ─────────────────────────────── data ────────────────────────────────────── */
 const MOODS = {
   cinematic: {
-    label: 'Cinematic', word: 'cinema.',
+    label: 'Cinematic', word: 'beat.',
     ac: '#7a9acc', rgb: '122,154,204',
     lO: '#0a0f1e', lI: '#3a5080', lF: '#c8d8f8', lT: 'CINEMATIC',
     audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518316/ambient-cinematic.wav',
@@ -411,12 +411,11 @@ export default function RecordPlayer() {
           <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(90deg, transparent 0%, rgba(6,8,8,0.45) 40%, rgba(6,8,8,0.7) 100%)' }} />
 
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '8px', letterSpacing: '0.48em', textTransform: 'uppercase', color: 'var(--ac)', opacity: 0.65, marginBottom: '20px' }}>
-            03 — Pick Your Mood
+            02 — Pick Your Mood
           </p>
 
           <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px,3.8vw,56px)', fontWeight: 200, fontStyle: 'italic', color: '#f0ead8', lineHeight: 1.2, marginBottom: '12px' }}>
-            Every love story has a different{' '}
-            <em style={{ color: 'var(--ac)', fontStyle: 'inherit' }}>{mood.word}</em>
+            Every love story has a different <span style={{ color: mood.ac }}>{mood.word}</span>
           </h2>
 
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '10px', color: '#f0ead8', opacity: 0.25, marginBottom: '36px', letterSpacing: '0.08em' }}>

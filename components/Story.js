@@ -129,7 +129,7 @@ export default function Story() {
             color:         'var(--gold)',
           }}
         >
-          05 — Our Story
+          03 — Our Story
         </p>
 
         {/* Blockquote headline */}

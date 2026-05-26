@@ -235,8 +235,6 @@ function StatCard({ value, label, revealDelay }) {
 export default function WhyUs() {
   const [headerRef,  headerVisible]  = useReveal(0.1);
   const [closingRef, closingVisible] = useReveal(0.2);
-  const [ctaHov,     setCtaHov]      = useState(false);
-  const [partnerHov, setPartnerHov]  = useState(false);
 
   return (
     <section id="planners" style={{ background: 'var(--black)' }}>
@@ -273,7 +271,7 @@ export default function WhyUs() {
               color:         'var(--gold)',
             }}
           >
-            09 — For Event Planners
+            06 — For Partners
           </p>
         </div>
 
@@ -297,9 +295,7 @@ export default function WhyUs() {
               margin:      0,
             }}
           >
-            Why Event Planners
-            <br />
-            <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Choose VS Studio.</em>
+            Why YOU should choose US.
           </h2>
 
           {/* Right — premise + CTA */}
@@ -320,27 +316,6 @@ export default function WhyUs() {
               events look extraordinary — and makes you look brilliant for recommending us.
               Every time.
             </p>
-            <a
-              href="#cta"
-              className="hov"
-              onMouseEnter={() => setPartnerHov(true)}
-              onMouseLeave={() => setPartnerHov(false)}
-              style={{
-                display:        'inline-block',
-                background:     partnerHov ? 'var(--ivory)' : 'var(--gold)',
-                color:          'var(--black)',
-                fontFamily:     "'Montserrat', sans-serif",
-                fontSize:       '9px',
-                fontWeight:     500,
-                letterSpacing:  '0.22em',
-                textTransform:  'uppercase',
-                textDecoration: 'none',
-                padding:        '11px 24px',
-                transition:     'background 0.3s ease',
-              }}
-            >
-              Partner With Us →
-            </a>
           </div>
         </div>
       </div>
@@ -406,30 +381,6 @@ export default function WhyUs() {
           {' '}it. And they tell everyone who made it possible."
         </blockquote>
 
-        {/* CTA button */}
-        <a
-          href="#cta"
-          className="hov"
-          onMouseEnter={() => setCtaHov(true)}
-          onMouseLeave={() => setCtaHov(false)}
-          style={{
-            display:        'inline-block',
-            background:     ctaHov ? 'var(--ivory)' : 'var(--gold)',
-            color:          'var(--black)',
-            fontFamily:     "'Montserrat', sans-serif",
-            fontSize:       '9px',
-            fontWeight:     500,
-            letterSpacing:  '0.22em',
-            textTransform:  'uppercase',
-            textDecoration: 'none',
-            padding:        '14px 28px',
-            whiteSpace:     'nowrap',
-            flexShrink:     0,
-            transition:     'background 0.3s ease',
-          }}
-        >
-          Begin a Partnership →
-        </a>
       </div>
     </section>
   );

@@ -48,7 +48,7 @@ export default function Footer() {
           opacity:       0.18,
         }}
       >
-        © 2025 VS Studio. All rights reserved.
+        © 2026 VS Studio. All rights reserved.
       </p>
 
       {/* Right — nav links */}

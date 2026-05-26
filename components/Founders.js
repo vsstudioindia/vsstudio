@@ -298,7 +298,7 @@ export default function Founders() {
               marginBottom:  '20px',
             }}
           >
-            06 — The Visionaries
+            04 — The Visionaries
           </p>
 
           {/* Headline */}
@@ -346,7 +346,7 @@ export default function Founders() {
             VS Studio was founded by two women who refused to let wedding
             photography be ordinary. They brought fashion sensibility, cinematic
             ambition, and relentless craft to every frame — and built one of
-            India's most distinctive visual studios in the process.
+            India's most distinctive media houses in the process.
           </p>
         </div>
       </section>
@@ -402,19 +402,19 @@ export default function Founders() {
       >
         <FounderCard
           src="https://res.cloudinary.com/drn6x6hbd/image/upload/vrinda"
-          role="Co-Founder & Creative Director"
+          role="Co-Founder & Story-teller"
           name="Vrinda Ganeriwala"
-          title="Photographer · Filmmaker · Canon Ambassador"
-          bio="A trained fashion photographer who reimagined what wedding documentation could look like. 11 years, 500+ weddings, and a Canon Ambassador badge later — she still treats every shoot like a Vogue editorial."
-          badge="Canon Ambassador — India"
+          title="Photographer. Story-teller. Canon Wizard."
+          bio="Vrinda doesn't just photograph weddings — she narrates them. With an eye trained across 11 years and 500+ love stories, she finds the frame that holds the entire emotion of a day. A Canon Wizard and instinctive storyteller, she has redefined what wedding photography looks like in India."
+          badge="Canon Wizard"
           isLast={false}
         />
         <FounderCard
           src="https://res.cloudinary.com/drn6x6hbd/image/upload/shristi"
-          role="Co-Founder & Director of Films"
+          role="Co-Founder & Creative Director"
           name="Shristi Dhandharia"
-          title="Cinematographer · Editor · Storyteller"
-          bio="The cinematic half of VS Studio. Her wedding films have been featured in international bridal publications. She believes every wedding deserves a film that makes audiences cry — twice."
+          title="Photographer. Story-teller. Canon Wizard."
+          bio="Shristi builds worlds out of moving images. As the cinematic force behind VS Studio, she crafts wedding films that feel less like documentation and more like memory. Her work has appeared in international bridal publications — because great cinema knows no borders."
           badge="Award-Winning Filmmaker"
           isLast={true}
           imgObjectPosition="center 20%"

@@ -373,19 +373,8 @@ export default function Sphere() {
             marginBottom:  '16px',
           }}
         >
-          10 — Editorial Showcase
+          01 — Editorial Showcase
         </p>
-        <h2
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize:   'clamp(1.8rem, 3.5vw, 3rem)',
-            fontWeight: 400,
-            color:      'var(--ivory)',
-            lineHeight: 1.1,
-          }}
-        >
-          Fashion Portrait Showcase
-        </h2>
       </div>
 
       {/* Canvas */}

@@ -78,19 +78,6 @@ export default function Awards() {
       >
         {/* Header */}
         <div style={{ padding: '0 56px 56px' }}>
-          <p
-            style={{
-              fontFamily:    "'Montserrat', sans-serif",
-              fontSize:      '9px',
-              fontWeight:    300,
-              letterSpacing: '0.4em',
-              textTransform: 'uppercase',
-              color:         '#c9a84c',
-              marginBottom:  '20px',
-            }}
-          >
-            08 — Recognition
-          </p>
           <h2
             style={{
               fontFamily: "'Cormorant Garamond', serif",

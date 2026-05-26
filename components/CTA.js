@@ -144,7 +144,9 @@ export default function CTA() {
 
         {/* CTA button */}
         <a
-          href="mailto:hello@vsstudio.in"
+          href="https://forms.gle/4Ci7mGTEL436g1RL9"
+          target="_blank"
+          rel="noopener noreferrer"
           className="hov"
           onMouseEnter={() => setBtnHov(true)}
           onMouseLeave={() => setBtnHov(false)}
@@ -177,7 +179,7 @@ export default function CTA() {
             opacity:       0.2,
           }}
         >
-          Limited availability — 2025 &amp; 2026
+          Limited availability — 2026 &amp; 2027
         </p>
       </div>
     </section>

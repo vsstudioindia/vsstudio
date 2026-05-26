@@ -200,7 +200,7 @@ export default function Team() {
             marginBottom:  '48px',
           }}
         >
-          VS Studio — Est. 2014
+          VS Studio — Est. 2015
         </p>
 
         <h2
@@ -214,7 +214,7 @@ export default function Team() {
             margin:     0,
           }}
         >
-          Eleven years of showing up.
+          <><span style={{color:'#c9a84c',fontWeight:600}}>11</span> years of showing up.</>
           <br />
           For the light. For the moment.
           <br />

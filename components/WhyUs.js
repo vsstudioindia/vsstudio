@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 function useReveal(threshold = 0.1) {
   const ref = useRef(null);
@@ -233,6 +234,7 @@ function StatCard({ value, label, revealDelay }) {
 
 /* ── Main export ─────────────────────────────────────────────────────────── */
 export default function WhyUs() {
+  const isMobile = useMobile();
   const [headerRef,  headerVisible]  = useReveal(0.1);
   const [closingRef, closingVisible] = useReveal(0.2);
 
@@ -244,7 +246,7 @@ export default function WhyUs() {
         ref={headerRef}
         style={{
           background:    'var(--emerald2)',
-          padding:       '72px 56px 64px',
+          padding:       isMobile ? '56px 24px 48px' : '72px 56px 64px',
           borderBottom:  '1px solid rgba(201,168,76,0.12)',
           opacity:       headerVisible ? 1 : 0,
           transform:     headerVisible ? 'translateY(0)' : 'translateY(24px)',
@@ -279,8 +281,8 @@ export default function WhyUs() {
         <div
           style={{
             display:             'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap:                 '64px',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap:                 isMobile ? '28px' : '64px',
             alignItems:          'end',
           }}
         >
@@ -324,7 +326,7 @@ export default function WhyUs() {
       <div
         style={{
           display:             'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
           gap:                 '1px',
           background:          'rgba(201,168,76,0.06)',
         }}
@@ -338,7 +340,7 @@ export default function WhyUs() {
       <div
         style={{
           display:             'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
           gap:                 '1px',
           background:          'rgba(201,168,76,0.06)',
         }}
@@ -352,7 +354,7 @@ export default function WhyUs() {
       <div
         ref={closingRef}
         style={{
-          padding:        '72px 56px',
+          padding:        isMobile ? '48px 24px' : '72px 56px',
           display:        'flex',
           justifyContent: 'space-between',
           alignItems:     'center',

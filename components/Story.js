@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
@@ -19,6 +20,7 @@ function useReveal(threshold = 0.15) {
 }
 
 export default function Story() {
+  const isMobile = useMobile();
   const [leftRef,  leftVisible]  = useReveal(0.15);
   const [rightRef, rightVisible] = useReveal(0.15);
 
@@ -26,9 +28,9 @@ export default function Story() {
     <section
       id="story"
       style={{
-        display:       'grid',
-        gridTemplateColumns: '1fr 1fr',
-        minHeight:     '100vh',
+        display:             'grid',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        minHeight:           '100vh',
       }}
     >
       {/* ── Left — image panel ─────────────────────────────────────────── */}
@@ -37,6 +39,7 @@ export default function Story() {
         style={{
           position:   'relative',
           overflow:   'hidden',
+          minHeight:  isMobile ? '60vw' : 'auto',
           opacity:    leftVisible ? 1 : 0,
           transform:  leftVisible ? 'translateX(0)' : 'translateX(-40px)',
           transition: 'opacity 1.1s ease, transform 1.1s ease',
@@ -108,7 +111,7 @@ export default function Story() {
         ref={rightRef}
         style={{
           background:     'var(--emerald)',
-          padding:        '110px 64px',
+          padding:        isMobile ? '56px 24px' : '110px 64px',
           display:        'flex',
           flexDirection:  'column',
           justifyContent: 'center',

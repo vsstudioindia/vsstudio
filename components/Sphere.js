@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 const IMAGE_PATHS = [
   'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere1.jpg',
@@ -52,6 +53,7 @@ export default function Sphere() {
   const imagesRef  = useRef([]);
   const rafRef     = useRef(null);
   const [loaded,  setLoaded]  = useState(false);
+  const isMobile = useMobile();
 
   /* ── Pre-load all images once ─────────────────────────────────────────── */
   useEffect(() => {
@@ -357,10 +359,10 @@ export default function Sphere() {
   return (
     <section
       id="showcase"
-      style={{ background: 'var(--black2)', paddingTop: '110px' }}
+      style={{ background: 'var(--black2)', paddingTop: isMobile ? '72px' : '110px' }}
     >
       {/* Section header */}
-      <div style={{ padding: '0 56px 48px' }}>
+      <div style={{ padding: isMobile ? '0 24px 32px' : '0 56px 48px' }}>
         <p
           style={{
             fontFamily:    "'Montserrat', sans-serif",
@@ -377,17 +379,47 @@ export default function Sphere() {
         </p>
       </div>
 
-      {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="hov"
-        style={{
-          display: 'block',
-          width:   '100%',
-          height:  '780px',
-          cursor:  'none',
-        }}
-      />
+      {/* Mobile: 2-column image grid — desktop canvas untouched */}
+      {isMobile ? (
+        <div
+          style={{
+            display:             'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap:                 '2px',
+          }}
+        >
+          {IMAGE_PATHS.map((src, i) => (
+            <div
+              key={i}
+              style={{ aspectRatio: '3/4', overflow: 'hidden' }}
+            >
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                style={{
+                  display:    'block',
+                  width:      '100%',
+                  height:     '100%',
+                  objectFit:  'cover',
+                  filter:     'brightness(0.85) saturate(0.88)',
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <canvas
+          ref={canvasRef}
+          className="hov"
+          style={{
+            display: 'block',
+            width:   '100%',
+            height:  '780px',
+            cursor:  'none',
+          }}
+        />
+      )}
     </section>
   );
 }

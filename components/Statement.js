@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 function useReveal() {
   const ref = useRef(null);
@@ -40,6 +41,8 @@ function Reveal({ children, delay = 0 }) {
 }
 
 export default function Statement() {
+  const isMobile = useMobile();
+
   useEffect(() => {
     console.log('[Statement] mounted');
   }, []);
@@ -95,14 +98,14 @@ export default function Statement() {
       {/* Text content */}
       <div
         style={{
-          position:       'relative',
-          zIndex:         2,
-          textAlign:      'center',
-          padding:        '0 clamp(1.5rem, 8vw, 8rem)',
-          maxWidth:       '860px',
-          display:        'flex',
-          flexDirection:  'column',
-          alignItems:     'center',
+          position:      'relative',
+          zIndex:        2,
+          textAlign:     'center',
+          padding:       isMobile ? '80px 24px' : '0 clamp(1.5rem, 8vw, 8rem)',
+          maxWidth:      '860px',
+          display:       'flex',
+          flexDirection: 'column',
+          alignItems:    'center',
         }}
       >
         <Reveal delay={0}>
@@ -126,7 +129,7 @@ export default function Statement() {
             style={{
               fontFamily:   "'Cormorant Garamond', serif",
               fontStyle:    'italic',
-              fontSize:     'clamp(2.4rem, 5.5vw, 5rem)',
+              fontSize:     'clamp(1.9rem, 5.5vw, 5rem)',
               fontWeight:   300,
               lineHeight:   1.15,
               color:        'var(--ivory)',
@@ -142,7 +145,7 @@ export default function Statement() {
             style={{
               fontFamily:   "'Cormorant Garamond', serif",
               fontStyle:    'italic',
-              fontSize:     'clamp(2.4rem, 5.5vw, 5rem)',
+              fontSize:     'clamp(1.9rem, 5.5vw, 5rem)',
               fontWeight:   300,
               lineHeight:   1.15,
               color:        'var(--gold)',

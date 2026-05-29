@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 /* ── Shared scroll-reveal hook ───────────────────────────────────────────── */
 function useReveal(threshold = 0.12) {
@@ -34,7 +35,7 @@ function FounderCard({ src, role, name, title, bio, badge, isLast,
       onMouseLeave={() => setHovered(false)}
       style={{
         position:   'relative',
-        height:     '700px',
+        height:     'clamp(420px, 70vw, 700px)',
         overflow:   'hidden',
         opacity:    visible ? 1 : 0,
         transform:  visible ? 'translateY(0)' : 'translateY(32px)',
@@ -214,6 +215,7 @@ function FounderCard({ src, role, name, title, bio, badge, isLast,
 
 /* ── Main export ─────────────────────────────────────────────────────────── */
 export default function Founders() {
+  const isMobile = useMobile();
   /* Banner image zoom: scale(1.04) → scale(1) over 8s on mount */
   const [zoomed, setZoomed] = useState(false);
   const [bannerRef, bannerVisible] = useReveal(0.05);
@@ -226,7 +228,7 @@ export default function Founders() {
   }, []);
 
   return (
-    <div id="visionaries">
+    <div id="founders">
 
       {/* ══ PART 1 — Full-height banner ══════════════════════════════════ */}
       <section
@@ -283,7 +285,7 @@ export default function Founders() {
           style={{
             position: 'relative',
             zIndex:   2,
-            padding:  '0 56px 80px',
+            padding:  isMobile ? '0 24px 56px' : '0 56px 80px',
           }}
         >
           {/* Eyebrow */}
@@ -305,7 +307,7 @@ export default function Founders() {
           <h2
             style={{
               fontFamily:  "'Cormorant Garamond', serif",
-              fontSize:    'clamp(56px, 8vw, 112px)',
+              fontSize:    'clamp(36px, 8vw, 112px)',
               fontWeight:  200,
               lineHeight:  0.98,
               color:       'var(--ivory)',
@@ -356,10 +358,11 @@ export default function Founders() {
         ref={quoteRef}
         style={{
           background:     'var(--emerald2)',
-          padding:        '36px 56px',
+          padding:        isMobile ? '28px 24px' : '36px 56px',
           display:        'flex',
           alignItems:     'center',
-          gap:            '40px',
+          gap:            isMobile ? '16px' : '40px',
+          flexWrap:       'wrap',
           opacity:        quoteVisible ? 1 : 0,
           transform:      quoteVisible ? 'translateY(0)' : 'translateY(16px)',
           transition:     'opacity 0.9s ease, transform 0.9s ease',
@@ -377,7 +380,7 @@ export default function Founders() {
             fontWeight:  300,
             color:       'var(--ivory)',
             margin:      0,
-            whiteSpace:  'nowrap',
+            whiteSpace:  isMobile ? 'normal' : 'nowrap',
           }}
         >
           Two women. One vision.{' '}
@@ -395,7 +398,7 @@ export default function Founders() {
         ref={cardsRef}
         style={{
           display:             'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
           opacity:             cardsVisible ? 1 : 0,
           transition:          'opacity 0.6s ease',
         }}

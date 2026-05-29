@@ -31,6 +31,12 @@ body {
   overflow-x: hidden;
 }
 
+/* ─── Touch devices — restore cursor, hide custom cursor elements ─────────── */
+@media (hover: none) and (pointer: coarse) {
+  body { cursor: auto; }
+  #cur-dot, #cur-ring { display: none !important; }
+}
+
 /* ─── Custom Scrollbar ─────────────────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 2px; }
 ::-webkit-scrollbar-track  { background: var(--black); }
@@ -89,7 +95,7 @@ body {
 /* Main headline — Cormorant Garamond, display size */
 .hero-h {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-size: clamp(2rem, 8vw, 6rem);
   font-weight: 400;
   line-height: 1.12;
   letter-spacing: -0.01em;

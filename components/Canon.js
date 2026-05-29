@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 const VIDEOS = [
   {
@@ -15,6 +16,7 @@ const VIDEOS = [
 
 export default function Canon() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const isMobile = useMobile();
 
   const sectionRef   = useRef(null);
   const trackRef     = useRef(null);
@@ -106,12 +108,21 @@ export default function Canon() {
           );
           pointer-events: none;
         }
+        @media (max-width: 767px) {
+          #canon {
+            grid-template-columns: 1fr;
+            min-height: auto;
+          }
+          .canon-right::before {
+            display: none;
+          }
+        }
       `}</style>
 
       <section id="canon" ref={sectionRef}>
 
         {/* ══ LEFT — BLEEDING VIDEOS ══════════════════════════════════════ */}
-        <div style={{ position: 'relative', overflow: 'hidden', height: '100vh' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', height: isMobile ? '56vw' : '100vh' }}>
 
           {/* Sliding track */}
           <div
@@ -236,7 +247,7 @@ export default function Canon() {
             display:        'flex',
             flexDirection:  'column',
             justifyContent: 'center',
-            padding:        '100px 64px',
+            padding:        isMobile ? '56px 24px' : '100px 64px',
             background:     'var(--black2)',
           }}
         >

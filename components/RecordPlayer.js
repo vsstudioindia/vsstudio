@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 /* ─────────────────────────────── data ────────────────────────────────────── */
 const MOODS = {
@@ -52,7 +53,7 @@ const CARD_CONFIG = [
 ];
 
 /* ─────────────────────────────── AlbumCard ───────────────────────────────── */
-function AlbumCard({ couple, cfg, acColor, moodLabel, onClick }) {
+function AlbumCard({ couple, cfg, acColor, moodLabel, onClick, isMobile }) {
   const [hov, setHov] = useState(false);
   return (
     <div
@@ -61,18 +62,18 @@ function AlbumCard({ couple, cfg, acColor, moodLabel, onClick }) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        position:     'absolute',
-        top:          cfg.top,
-        left:         cfg.left,
-        width:        '168px',
-        height:       '168px',
+        position:     isMobile ? 'relative' : 'absolute',
+        top:          isMobile ? 'auto' : cfg.top,
+        left:         isMobile ? 'auto' : cfg.left,
+        width:        isMobile ? '100%' : '168px',
+        height:       isMobile ? '200px' : '168px',
         borderRadius: '3px',
         overflow:     'hidden',
-        cursor:       'none',
-        animation:    cfg.anim,
+        cursor:       isMobile ? 'pointer' : 'none',
+        animation:    isMobile ? 'none' : cfg.anim,
         outline:      hov ? `1px solid ${acColor}` : '1px solid transparent',
         transition:   'outline 0.3s ease',
-        willChange:   'transform',
+        willChange:   isMobile ? 'auto' : 'transform',
       }}
     >
       <img
@@ -165,6 +166,7 @@ export default function RecordPlayer() {
   const [isMuted,       setIsMuted]       = useState(false);
   const [lightboxVideo, setLightboxVideo] = useState(null);
   const [lightboxName,  setLightboxName]  = useState('');
+  const isMobile = useMobile();
 
   const sectionRef    = useRef(null);
   const audioRef      = useRef(null);
@@ -335,10 +337,17 @@ export default function RecordPlayer() {
       <section
         id="films"
         ref={sectionRef}
-        style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#060808', '--ac': mood.ac }}
+        style={{
+          position:  'relative',
+          width:     '100%',
+          height:    isMobile ? 'auto' : '100vh',
+          overflow:  isMobile ? 'visible' : 'hidden',
+          background:'#060808',
+          '--ac':    mood.ac,
+        }}
       >
-        {/* ══ LEFT — VINYL STAGE ══════════════════════════════════════════ */}
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        {/* ══ LEFT — VINYL STAGE (hidden on mobile) ═══════════════════════ */}
+        <div style={{ display: isMobile ? 'none' : 'block', position: 'absolute', inset: 0, overflow: 'hidden' }}>
 
           {/* Ambient depth glow */}
           <div style={{
@@ -407,7 +416,18 @@ export default function RecordPlayer() {
         </div>
 
         {/* ══ RIGHT — CONTENT PANEL ═══════════════════════════════════════ */}
-        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '44%', zIndex: 20, padding: '80px 64px 80px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{
+          position:      isMobile ? 'relative' : 'absolute',
+          right:         isMobile ? 'auto' : 0,
+          top:           isMobile ? 'auto' : 0,
+          bottom:        isMobile ? 'auto' : 0,
+          width:         isMobile ? '100%' : '44%',
+          zIndex:        20,
+          padding:       isMobile ? '72px 24px 60px' : '80px 64px 80px 48px',
+          display:       'flex',
+          flexDirection: 'column',
+          justifyContent:'center',
+        }}>
           <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(90deg, transparent 0%, rgba(6,8,8,0.45) 40%, rgba(6,8,8,0.7) 100%)' }} />
 
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '8px', letterSpacing: '0.48em', textTransform: 'uppercase', color: 'var(--ac)', opacity: 0.65, marginBottom: '20px' }}>
@@ -447,7 +467,13 @@ export default function RecordPlayer() {
           </div>
 
           {/* Album cards */}
-          <div style={{ position: 'relative', height: '340px' }}>
+          <div style={{
+            position:      isMobile ? 'relative' : 'relative',
+            height:        isMobile ? 'auto' : '340px',
+            display:       isMobile ? 'flex' : 'block',
+            flexDirection: 'column',
+            gap:           isMobile ? '10px' : '0',
+          }}>
             {mood.couples.map((couple, i) => (
               <AlbumCard
                 key={`${activeMood}-${i}`}
@@ -456,6 +482,7 @@ export default function RecordPlayer() {
                 acColor={mood.ac}
                 moodLabel={mood.label}
                 onClick={() => openLightbox(couple.video, couple.name)}
+                isMobile={isMobile}
               />
             ))}
           </div>
@@ -465,9 +492,11 @@ export default function RecordPlayer() {
         <button
           onClick={handleMuteToggle}
           style={{
-            position:      'absolute',
-            bottom:        '32px',
-            right:         '32px',
+            position:      isMobile ? 'relative' : 'absolute',
+            bottom:        isMobile ? 'auto' : '32px',
+            right:         isMobile ? 'auto' : '32px',
+            alignSelf:     isMobile ? 'flex-start' : 'auto',
+            margin:        isMobile ? '20px 24px 40px' : '0',
             zIndex:        30,
             background:    'transparent',
             border:        '1px solid rgba(201,168,76,0.4)',

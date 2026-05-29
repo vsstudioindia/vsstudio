@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
@@ -23,6 +24,7 @@ const GRAIN_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 export default function CTA() {
+  const isMobile = useMobile();
   const [ref, visible] = useReveal(0.15);
   const [btnHov, setBtnHov] = useState(false);
 
@@ -72,7 +74,7 @@ export default function CTA() {
           position:       'relative',
           zIndex:         1,
           maxWidth:       '660px',
-          padding:        '80px 56px',
+          padding:        isMobile ? '64px 24px' : '80px 56px',
           textAlign:      'center',
           display:        'flex',
           flexDirection:  'column',
@@ -103,7 +105,7 @@ export default function CTA() {
           style={{
             fontFamily:   "'Cormorant Garamond', serif",
             fontStyle:    'italic',
-            fontSize:     'clamp(44px, 7vw, 92px)',
+            fontSize:     'clamp(32px, 7vw, 92px)',
             fontWeight:   300,
             lineHeight:   1.05,
             color:        'var(--ivory)',
@@ -160,7 +162,7 @@ export default function CTA() {
             letterSpacing:  btnHov ? '0.62em' : '0.52em',
             textTransform:  'uppercase',
             textDecoration: 'none',
-            padding:        '18px 52px',
+            padding:        isMobile ? '14px 32px' : '18px 52px',
             transition:     'background 0.4s ease, letter-spacing 0.4s ease',
             marginBottom:   '24px',
           }}

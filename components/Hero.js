@@ -42,8 +42,10 @@ export default function Hero() {
     return () => clearInterval(id);
   }, []);
 
-  /* Mouse parallax — write transform directly to the active image div */
+  /* Mouse parallax — disabled on mobile (touch devices have no mousemove) */
   useEffect(() => {
+    if (window.innerWidth < 768) return;
+
     const onMove = (e) => {
       targetX.current = ((e.clientX / window.innerWidth)  * 2 - 1) * PAR_X;
       targetY.current = ((e.clientY / window.innerHeight) * 2 - 1) * PAR_Y;
@@ -133,8 +135,8 @@ export default function Hero() {
           inset:        0,
           display:      'flex',
           alignItems:   'center',
-          paddingLeft:  'clamp(2rem, 8vw, 9rem)',
-          paddingRight: 'clamp(2rem, 8vw, 9rem)',
+          paddingLeft:  'clamp(1.5rem, 8vw, 9rem)',
+          paddingRight: 'clamp(1.5rem, 8vw, 9rem)',
           zIndex:       4,
         }}
       >

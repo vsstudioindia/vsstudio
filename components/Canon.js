@@ -252,7 +252,7 @@ export default function Canon() {
           }}
         >
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '8px', letterSpacing: '0.48em', textTransform: 'uppercase', color: 'var(--gold)', opacity: 0.65, marginBottom: '24px' }}>
-            05 — Craft & Recognition
+            04 — Craft & Recognition
           </p>
 
           <h2

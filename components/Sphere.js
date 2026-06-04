@@ -36,14 +36,29 @@ const CATEGORIES = [
   },
 ];
 
-const R   = 360; /* sphere radius */
-const FOV = 900; /* perspective distance */
+const R     = 360;  /* sphere radius */
+const FOV   = 900;  /* perspective distance */
+const T_H   = 200;  /* horizontal spread of triangle */
+const LERP  = 0.055; /* ~0.8s transition at 60fps */
 
-function fibonacciNode(i, total) {
+/* Base node layout — 12 fibonacci points on a unit sphere, scaled by R */
+const BASE_NODES = Array.from({ length: 12 }, (_, i) => {
+  const total = 12;
   const y     = 1 - (i / (total - 1)) * 2;
   const r     = Math.sqrt(1 - y * y);
   const theta = i * Math.PI * (3 - Math.sqrt(5));
-  return { ox: r * Math.cos(theta), oy: y, oz: r * Math.sin(theta) };
+  return {
+    ox: r * Math.cos(theta) * R,
+    oy: y * R,
+    oz: r * Math.sin(theta) * R,
+    w:  270 + (i % 3) * 60,
+    h:  360 + (i % 4) * 45,
+    index: i,
+  };
+});
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function rotateX(x, y, z, a) {
@@ -57,110 +72,112 @@ function rotateY(x, y, z, a) {
 }
 
 export default function Sphere() {
-  const canvasRef  = useRef(null);
-  const stateRef   = useRef({
-    rotX: 0.18, rotY: 0,
-    velX: 0,    velY: 0.003,
-    isDragging: false,
-    lastMX: 0,  lastMY: 0,
-    hoveredNode: -1,
-    mouseX: -9999, mouseY: -9999,
-    targetRotX: null, targetRotY: null,
-  });
-  const imagesRef    = useRef([]);
+  const canvasRef    = useRef(null);
   const rafRef       = useRef(null);
+  const allImagesRef = useRef({});         /* { [catKey]: Image[] } */
+  const triangleRef  = useRef({ angle: 0, targetAngle: 0 });
+  const activeCatRef = useRef(0);          /* index into CATEGORIES */
+  const mouseRef     = useRef({ x: -9999, y: -9999 });
+  const spherePosRef = useRef([]);         /* last-drawn {cx, cy, sphScale} per sphere */
+
+  /* Independent rotation state per sphere — start at different rotY so they look distinct */
+  const sphereRots = useRef([
+    { rotX: 0.18, rotY: 0,    velX: 0, velY: 0.003,  isDragging: false, lastMX: 0, lastMY: 0, focusedNode: -1, seekStartTime: null, seekDuration: 600, seekStartRotX: 0, seekStartRotY: 0, seekTargetRotX: 0, seekTargetRotY: 0 },
+    { rotX: 0.22, rotY: 2.09, velX: 0, velY: 0.0028, isDragging: false, lastMX: 0, lastMY: 0, focusedNode: -1, seekStartTime: null, seekDuration: 600, seekStartRotX: 0, seekStartRotY: 0, seekTargetRotX: 0, seekTargetRotY: 0 },
+    { rotX: 0.15, rotY: 4.19, velX: 0, velY: 0.0032, isDragging: false, lastMX: 0, lastMY: 0, focusedNode: -1, seekStartTime: null, seekDuration: 600, seekStartRotX: 0, seekStartRotY: 0, seekTargetRotX: 0, seekTargetRotY: 0 },
+  ]);
+
   const [activeCategory, setActiveCategory] = useState('editorial');
-  const [imagesVersion,  setImagesVersion]  = useState(0);
+  const [allLoaded,      setAllLoaded]      = useState(false);
   const isMobile = useMobile();
 
   const activeCat = CATEGORIES.find((c) => c.key === activeCategory);
 
-  /* ── Load images whenever category changes ───────────────────────────────── */
+  /* ── Preload every category's images once on mount ───────────────────────── */
   useEffect(() => {
     let done = 0;
-    const paths = activeCat.images;
-    const imgs = paths.map((src) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        console.log('Loaded successfully:', img.src);
-        done++;
-        if (done === paths.length) { imagesRef.current = imgs; setImagesVersion((v) => v + 1); }
-      };
-      img.onerror = () => {
-        console.log('FAILED to load:', img.src);
-        done++;
-        if (done === paths.length) { imagesRef.current = imgs; setImagesVersion((v) => v + 1); }
-      };
-      return img;
+    const total = CATEGORIES.reduce((s, c) => s + c.images.length, 0);
+    CATEGORIES.forEach((cat) => {
+      const imgs = cat.images.map((src) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = img.onerror = () => {
+          done++;
+          if (done === total) setAllLoaded(true);
+        };
+        return img;
+      });
+      allImagesRef.current[cat.key] = imgs;
     });
-  }, [activeCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  /* ── Main canvas loop — restarts whenever images change ─────────────────── */
+  /* ── Update active index + triangle target angle on category change ──────── */
   useEffect(() => {
-    if (imagesVersion === 0) return;
+    const idx    = CATEGORIES.findIndex((c) => c.key === activeCategory);
+    activeCatRef.current = idx;
+    const rawTarget = -idx * (2 * Math.PI / 3);
+    const tr    = triangleRef.current;
+    let   diff  = rawTarget - tr.angle;
+    /* Shortest path normalisation */
+    while (diff >  Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    tr.targetAngle = tr.angle + diff;
+  }, [activeCategory]);
+
+  /* ── Main canvas loop ────────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!allLoaded) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const s   = stateRef.current;
 
-    /* Node geometry — computed once per image set */
-    const imgs  = imagesRef.current;
-    const count = imgs.length;
-    const nodes = imgs.map((_, i) => {
-      const { ox, oy, oz } = fibonacciNode(i, count);
-      return {
-        ox: ox * R, oy: oy * R, oz: oz * R,
-        w:  270 + (i % 3) * 60,
-        h:  360 + (i % 4) * 45,
-        img: imgs[i],
-        index: i,
-      };
-    });
+    /* Draw one sphere centered at (cx, cy) */
+    function drawSphere(catKey, cx, cy, sphScale, alpha, isActive) {
+      const imgs = allImagesRef.current[catKey] || [];
+      const si   = CATEGORIES.findIndex((c) => c.key === catKey);
+      const sr   = sphereRots.current[si];
+      const mX   = mouseRef.current.x;
+      const mY   = mouseRef.current.y;
+      const R_eff = R * sphScale;
 
-    function draw() {
-      const W = canvas.width;
-      const H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      ctx.globalAlpha = alpha;
 
-      /* Project every node */
-      const projected = nodes.map((n) => {
-        let [x, y, z] = rotateX(n.ox, n.oy, n.oz, s.rotX);
-        [x, y, z]     = rotateY(x, y, z, s.rotY);
-
-        const depth  = (z + R) / (2 * R);               /* 0 (back) … 1 (front) */
-        const scale  = FOV / (FOV + z);
-        const sx     = W / 2 - W * 0.1 + x * scale;
-        const sy     = H / 2 + y * scale;
+      /* Project all nodes for this sphere */
+      const projected = BASE_NODES.map((n) => {
+        let [x, y, z] = rotateX(n.ox * sphScale, n.oy * sphScale, n.oz * sphScale, sr.rotX);
+        [x, y, z]     = rotateY(x, y, z, sr.rotY);
+        const depth   = (z + R_eff) / (2 * R_eff);
+        const scale   = FOV / (FOV + z);
+        const sx      = cx + x * scale;
+        const sy      = cy + y * scale;
         return { ...n, sx, sy, z, scale, depth };
       });
 
       /* Sort back → front */
       projected.sort((a, b) => a.z - b.z);
 
-      /* Hit-test: walk front → back to find topmost hovered card */
-      let hit = -1;
-      for (let i = projected.length - 1; i >= 0; i--) {
-        const n  = projected[i];
-        const hw = (n.w * n.scale) / 2;
-        const hh = (n.h * n.scale) / 2;
-        if (
-          s.mouseX >= n.sx - hw && s.mouseX <= n.sx + hw &&
-          s.mouseY >= n.sy - hh && s.mouseY <= n.sy + hh
-        ) { hit = n.index; break; }
-      }
-      if (hit !== s.hoveredNode) {
-        s.hoveredNode = hit;
+      /* Hit-test for hover (active sphere only) */
+      let hoveredNode = -1;
+      if (isActive) {
+        for (let i = projected.length - 1; i >= 0; i--) {
+          const n  = projected[i];
+          const hw = (n.w * n.scale * sphScale) / 2;
+          const hh = (n.h * n.scale * sphScale) / 2;
+          if (mX >= n.sx - hw && mX <= n.sx + hw && mY >= n.sy - hh && mY <= n.sy + hh) {
+            hoveredNode = n.index; break;
+          }
+        }
       }
 
       /* Draw each card */
       projected.forEach((n) => {
-        const isHov  = n.index === s.hoveredNode;
-        const sc     = n.scale * (isHov ? 1.22 : 1);
-        const w      = n.w * sc;
-        const h      = n.h * sc;
+        const isHov     = isActive && n.index === hoveredNode;
+        const sc        = n.scale * sphScale * (isHov ? 1.15 : 1);
+        const w         = n.w * sc;
+        const h         = n.h * sc;
         const brightness = Math.min(1, 0.45 + n.depth * 0.55 + (isHov ? 0.2 : 0));
-        const blur   = isHov ? 0 : Math.max(0, (1 - n.depth) * 2.5);
+        const blur      = isHov ? 0 : Math.max(0, (1 - n.depth) * 2.5);
 
         ctx.save();
         ctx.translate(n.sx, n.sy);
@@ -170,22 +187,19 @@ export default function Sphere() {
         ctx.rect(-w / 2, -h / 2, w, h);
         ctx.clip();
 
-        /* Image — object-fit contain via 9-param drawImage */
+        /* Image — object-fit contain */
         ctx.filter = `brightness(${brightness}) saturate(0.88)${blur > 0 ? ` blur(${blur.toFixed(1)}px)` : ''}`;
-        if (n.img.complete && n.img.naturalWidth > 0) {
-          const imgRatio  = n.img.naturalWidth / n.img.naturalHeight;
+        const img = imgs[n.index];
+        if (img && img.complete && img.naturalWidth > 0) {
+          const imgRatio  = img.naturalWidth / img.naturalHeight;
           const cardRatio = w / h;
           let drawW, drawH;
           if (imgRatio > cardRatio) {
-            /* Image wider than card — fit width, letterbox top/bottom */
-            drawW = w;
-            drawH = w / imgRatio;
+            drawW = w; drawH = w / imgRatio;
           } else {
-            /* Image taller than card — fit height, letterbox left/right */
-            drawH = h;
-            drawW = h * imgRatio;
+            drawH = h; drawW = h * imgRatio;
           }
-          ctx.drawImage(n.img, 0, 0, n.img.naturalWidth, n.img.naturalHeight, -drawW / 2, -drawH / 2, drawW, drawH);
+          ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, -drawW / 2, -drawH / 2, drawW, drawH);
         } else {
           ctx.fillStyle = '#111';
           ctx.fillRect(-w / 2, -h / 2, w, h);
@@ -203,140 +217,216 @@ export default function Sphere() {
 
         ctx.restore();
       });
+
+      ctx.restore();
+    }
+
+    function draw() {
+      const W  = canvas.width;
+      const H  = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      const tr  = triangleRef.current;
+      const cX  = W * 0.44;
+      const cY  = H / 2;
+
+      /* Compute each sphere's triangle position this frame */
+      const sphereData = CATEGORIES.map((cat, i) => {
+        const phi      = tr.angle + i * (2 * Math.PI / 3);
+        const depth    = Math.cos(phi);              /* +1 = front, -1 = back */
+        const cx       = cX + Math.sin(phi) * T_H;
+        const sphScale = 0.45 + 0.55 * (depth + 1) / 2; /* 0.45 … 1.0 */
+        const alpha    = 0.40 + 0.60 * (depth + 1) / 2; /* 0.40 … 1.0 */
+        const isActive = i === activeCatRef.current;
+        return { catKey: cat.key, cx, cy: cY, sphScale, alpha, isActive, depth };
+      });
+
+      /* Store positions for event hit-testing */
+      spherePosRef.current = sphereData.map(({ cx, cy, sphScale }, i) => ({ cx, cy, sphScale, index: i }));
+
+      /* Draw back → front */
+      sphereData
+        .slice()
+        .sort((a, b) => a.depth - b.depth)
+        .forEach(({ catKey, cx, cy, sphScale, alpha, isActive }) =>
+          drawSphere(catKey, cx, cy, sphScale, alpha, isActive)
+        );
     }
 
     function tick() {
-      const s = stateRef.current;
-      if (s.targetRotX !== null && !s.isDragging) {
-        /* Seek mode — lerp toward target */
-        s.rotX += (s.targetRotX - s.rotX) * 0.05;
-        s.rotY += (s.targetRotY - s.rotY) * 0.05;
-        s.velX  = 0;
-        s.velY  = 0;
-        if (Math.abs(s.targetRotX - s.rotX) < 0.001 && Math.abs(s.targetRotY - s.rotY) < 0.001) {
-          s.rotX = s.targetRotX;
-          s.rotY = s.targetRotY;
-          s.targetRotX = null;
-          s.targetRotY = null;
+      const tr = triangleRef.current;
+
+      /* Lerp triangle toward target */
+      tr.angle += (tr.targetAngle - tr.angle) * LERP;
+
+      /* Rotate each sphere: drag → seek → auto-rotate */
+      sphereRots.current.forEach((sr) => {
+        if (sr.isDragging) {
+          sr.rotY += sr.velY;
+          sr.rotX += sr.velX;
+          sr.rotX  = Math.max(-1.1, Math.min(1.1, sr.rotX));
+        } else if (sr.seekStartTime !== null) {
+          const t     = Math.min(1, (performance.now() - sr.seekStartTime) / sr.seekDuration);
+          const eased = easeInOutCubic(t);
+          sr.rotX = sr.seekStartRotX + (sr.seekTargetRotX - sr.seekStartRotX) * eased;
+          sr.rotY = sr.seekStartRotY + (sr.seekTargetRotY - sr.seekStartRotY) * eased;
+          if (t >= 1) { sr.rotX = sr.seekTargetRotX; sr.rotY = sr.seekTargetRotY; sr.seekStartTime = null; }
+        } else {
+          sr.velY += (0.004 - sr.velY) * 0.02;
+          sr.velX += (0      - sr.velX) * 0.04;
+          sr.rotY += sr.velY;
+          sr.rotX += sr.velX;
+          sr.rotX  = Math.max(-1.1, Math.min(1.1, sr.rotX));
+          sr.velX *= 0.92;
+          sr.velY *= 0.97;
         }
-      } else if (!s.isDragging) {
-        /* Auto-rotate nudge */
-        s.velY += (0.004 - s.velY) * 0.02;
-        s.velX += (0      - s.velX) * 0.04;
-        s.rotY  += s.velY;
-        s.rotX  += s.velX;
-        s.rotX   = Math.max(-1.1, Math.min(1.1, s.rotX));
-        s.velX  *= 0.92;
-        s.velY  *= 0.97;
-      } else {
-        s.rotY  += s.velY;
-        s.rotX  += s.velX;
-        s.rotX   = Math.max(-1.1, Math.min(1.1, s.rotX));
-      }
+      });
+
       draw();
       rafRef.current = requestAnimationFrame(tick);
     }
 
-    /* Resize handler */
     function resize() {
       canvas.width  = canvas.offsetWidth;
       canvas.height = 780;
     }
     resize();
     window.addEventListener('resize', resize);
-
     rafRef.current = requestAnimationFrame(tick);
 
-    /* ── Mouse interaction ─────────────────────────────────────────── */
+    /* ── Hit-test: find sphere index under canvas coords mx, my ──────────── */
+    function hitSphere(mx, my) {
+      let hitIdx = -1;
+      let minDist = Infinity;
+      spherePosRef.current.forEach(({ cx, cy, sphScale, index }) => {
+        const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+        if (dist < R * sphScale * 1.4 && dist < minDist) {
+          minDist = dist;
+          hitIdx  = index;
+        }
+      });
+      return hitIdx;
+    }
+
+    /* ── Mouse interaction ─────────────────────────────────────────────── */
+    let wasDragging = false;
+
     function onMouseMove(e) {
       const rect = canvas.getBoundingClientRect();
-      s.mouseX = e.clientX - rect.left;
-      s.mouseY = e.clientY - rect.top;
-      if (s.isDragging) {
-        const dx = e.clientX - s.lastMX;
-        const dy = e.clientY - s.lastMY;
-        s.velY = dx * 0.008;
-        s.velX = dy * 0.008;
-        s.lastMX = e.clientX;
-        s.lastMY = e.clientY;
-      }
+      mouseRef.current.x = e.clientX - rect.left;
+      mouseRef.current.y = e.clientY - rect.top;
+      sphereRots.current.forEach((sr) => {
+        if (sr.isDragging) {
+          const dx  = e.clientX - sr.lastMX;
+          const dy  = e.clientY - sr.lastMY;
+          sr.velY   = dx * 0.008;
+          sr.velX   = dy * 0.008;
+          sr.lastMX = e.clientX;
+          sr.lastMY = e.clientY;
+          wasDragging = true;
+        }
+      });
     }
     function onMouseDown(e) {
-      s.isDragging    = true;
-      s.lastMX        = e.clientX;
-      s.lastMY        = e.clientY;
-      s.targetRotX    = null;
-      s.targetRotY    = null;
+      wasDragging = false;
+      const rect = canvas.getBoundingClientRect();
+      const idx  = hitSphere(e.clientX - rect.left, e.clientY - rect.top);
+      const sr   = sphereRots.current[idx >= 0 ? idx : activeCatRef.current];
+      sr.isDragging = true;
+      sr.lastMX     = e.clientX;
+      sr.lastMY     = e.clientY;
     }
 
     function onClick(e) {
+      if (wasDragging) return;
       const rect = canvas.getBoundingClientRect();
       const mx   = e.clientX - rect.left;
       const my   = e.clientY - rect.top;
-      const W    = canvas.width;
-      const H    = canvas.height;
 
-      /* Project nodes at current rotation and hit-test */
-      let hitNode = null;
-      const projected = nodes.map((n) => {
-        let [x, y, z] = rotateX(n.ox, n.oy, n.oz, s.rotX);
-        [x, y, z]     = rotateY(x, y, z, s.rotY);
+      /* Find which sphere was clicked */
+      const sphIdx = hitSphere(mx, my);
+      if (sphIdx < 0) return;
+
+      const sr  = sphereRots.current[sphIdx];
+      const pos = spherePosRef.current[sphIdx];
+      const { cx, cy, sphScale } = pos;
+
+      /* Project cards of that sphere and hit-test */
+      const projected = BASE_NODES.map((n) => {
+        let [x, y, z] = rotateX(n.ox * sphScale, n.oy * sphScale, n.oz * sphScale, sr.rotX);
+        [x, y, z]     = rotateY(x, y, z, sr.rotY);
         const scale   = FOV / (FOV + z);
-        const sx      = W / 2 + x * scale;
-        const sy      = H / 2 + y * scale;
-        return { ...n, sx, sy, z, scale };
+        return { ...n, sx: cx + x * scale, sy: cy + y * scale, z, scale };
       });
-      projected.sort((a, b) => b.z - a.z); /* front first for hit priority */
+      projected.sort((a, b) => b.z - a.z);
+
+      let hitNode = null;
       for (const n of projected) {
-        const hw = (n.w * n.scale) / 2;
-        const hh = (n.h * n.scale) / 2;
+        const hw = (n.w * n.scale * sphScale) / 2;
+        const hh = (n.h * n.scale * sphScale) / 2;
         if (mx >= n.sx - hw && mx <= n.sx + hw && my >= n.sy - hh && my <= n.sy + hh) {
-          hitNode = n;
-          break;
+          hitNode = n; break;
         }
       }
-      if (!hitNode) return;
 
-      /* Compute rotX/rotY that place the node's unit vector at (0,0,+1) */
-      const px = hitNode.ox / R;
-      const py = hitNode.oy / R;
-      const pz = hitNode.oz / R;
-      const tRotX = -Math.atan2(py, Math.sqrt(px * px + pz * pz)) * Math.sign(pz >= 0 ? 1 : -1);
-      const tRotY = Math.atan2(-px, pz);
+      /* Clicking empty space or re-clicking focused card → unfocus */
+      if (!hitNode || sr.focusedNode === hitNode.index) {
+        sr.focusedNode   = -1;
+        sr.seekStartTime = null;
+        return;
+      }
 
-      /* Shortest-path wrap for rotY so we don't spin the long way */
-      let dY = tRotY - (s.rotY % (2 * Math.PI));
+      /* Compute target rotation to bring clicked card front-center */
+      const ux = hitNode.ox / R;
+      const uy = hitNode.oy / R;
+      const uz = hitNode.oz / R;
+      let dY   = Math.atan2(-ux, uz) - (sr.rotY % (2 * Math.PI));
       if (dY >  Math.PI) dY -= 2 * Math.PI;
       if (dY < -Math.PI) dY += 2 * Math.PI;
 
-      s.targetRotX = -Math.asin(py);
-      s.targetRotY  = s.rotY + dY;
+      sr.focusedNode    = hitNode.index;
+      sr.seekStartRotX  = sr.rotX;
+      sr.seekStartRotY  = sr.rotY;
+      sr.seekTargetRotX = -Math.asin(uy);
+      sr.seekTargetRotY = sr.rotY + dY;
+      sr.seekStartTime  = performance.now();
     }
-    function onMouseUp() { s.isDragging = false; }
+    function onMouseUp() {
+      sphereRots.current.forEach((sr) => { sr.isDragging = false; });
+    }
     function onMouseLeave() {
-      s.isDragging = false;
-      s.mouseX = -9999;
-      s.mouseY = -9999;
+      sphereRots.current.forEach((sr) => { sr.isDragging = false; });
+      mouseRef.current.x = -9999;
+      mouseRef.current.y = -9999;
     }
 
-    /* ── Touch interaction ─────────────────────────────────────────── */
+    /* ── Touch interaction ─────────────────────────────────────────────── */
     function onTouchStart(e) {
-      const t = e.touches[0];
-      s.isDragging = true;
-      s.lastMX = t.clientX;
-      s.lastMY = t.clientY;
+      const rect = canvas.getBoundingClientRect();
+      const t    = e.touches[0];
+      const idx  = hitSphere(t.clientX - rect.left, t.clientY - rect.top);
+      const sr   = sphereRots.current[idx >= 0 ? idx : activeCatRef.current];
+      sr.isDragging = true;
+      sr.lastMX     = t.clientX;
+      sr.lastMY     = t.clientY;
     }
     function onTouchMove(e) {
       e.preventDefault();
       const t = e.touches[0];
-      const dx = t.clientX - s.lastMX;
-      const dy = t.clientY - s.lastMY;
-      s.velY = dx * 0.008;
-      s.velX = dy * 0.008;
-      s.lastMX = t.clientX;
-      s.lastMY = t.clientY;
+      sphereRots.current.forEach((sr) => {
+        if (sr.isDragging) {
+          const dx  = t.clientX - sr.lastMX;
+          const dy  = t.clientY - sr.lastMY;
+          sr.velY   = dx * 0.008;
+          sr.velX   = dy * 0.008;
+          sr.lastMX = t.clientX;
+          sr.lastMY = t.clientY;
+        }
+      });
     }
-    function onTouchEnd() { s.isDragging = false; }
+    function onTouchEnd() {
+      sphereRots.current.forEach((sr) => { sr.isDragging = false; });
+    }
 
     canvas.addEventListener('mousemove',  onMouseMove);
     canvas.addEventListener('mousedown',  onMouseDown);
@@ -359,9 +449,9 @@ export default function Sphere() {
       canvas.removeEventListener('touchmove',  onTouchMove);
       canvas.removeEventListener('touchend',   onTouchEnd);
     };
-  }, [imagesVersion]);
+  }, [allLoaded]);
 
-  /* ── Shared category button style ───────────────────────────────────────── */
+  /* ── Category button style (same as before) ──────────────────────────────── */
   const catBtnStyle = (key, vertical) => ({
     background:    'none',
     border:        'none',
@@ -394,59 +484,46 @@ export default function Sphere() {
         <>
           {/* Mobile: header */}
           <div style={{ padding: '0 24px 20px' }}>
-            <p
-              style={{
-                fontFamily:    "'Montserrat', sans-serif",
-                fontSize:      '0.6rem',
-                fontWeight:    300,
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color:         'var(--gold)',
-                opacity:       0.6,
-              }}
-            >
+            <p style={{
+              fontFamily:    "'Montserrat', sans-serif",
+              fontSize:      '0.6rem',
+              fontWeight:    300,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color:         'var(--gold)',
+              opacity:       0.6,
+            }}>
               01 — The Collection
             </p>
           </div>
 
           {/* Mobile: horizontal category tabs */}
-          <div
-            style={{
-              display:      'flex',
-              gap:          '28px',
-              padding:      '0 24px',
-              borderBottom: '1px solid rgba(255,255,255,0.05)',
-              marginBottom: '28px',
-              overflowX:    'auto',
-            }}
-          >
+          <div style={{
+            display:      'flex',
+            gap:          '28px',
+            padding:      '0 24px',
+            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            marginBottom: '28px',
+            overflowX:    'auto',
+          }}>
             {CATEGORIES.map((cat) => (
-              <button
-                key={cat.key}
-                onClick={() => setActiveCategory(cat.key)}
-                style={catBtnStyle(cat.key, false)}
-              >
+              <button key={cat.key} onClick={() => setActiveCategory(cat.key)} style={catBtnStyle(cat.key, false)}>
                 {cat.label}
               </button>
             ))}
           </div>
 
-          {/* Mobile: image grid for active category */}
+          {/* Mobile: active category image grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
             {activeCat.images.map((src, i) => (
               <div key={i} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
-                <img
-                  src={src}
-                  alt=""
-                  loading="lazy"
-                  style={{
-                    display:   'block',
-                    width:     '100%',
-                    height:    '100%',
-                    objectFit: 'cover',
-                    filter:    'brightness(0.85) saturate(0.88)',
-                  }}
-                />
+                <img src={src} alt="" loading="lazy" style={{
+                  display:   'block',
+                  width:     '100%',
+                  height:    '100%',
+                  objectFit: 'cover',
+                  filter:    'brightness(0.85) saturate(0.88)',
+                }} />
               </div>
             ))}
           </div>
@@ -454,28 +531,24 @@ export default function Sphere() {
       ) : (
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
 
-          {/* Left: header + vertical category menu */}
-          <div
-            style={{
-              width:         '220px',
-              flexShrink:    0,
-              padding:       '0 0 48px 56px',
-              display:       'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <p
-              style={{
-                fontFamily:    "'Montserrat', sans-serif",
-                fontSize:      '0.6rem',
-                fontWeight:    300,
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color:         'var(--gold)',
-                opacity:       0.6,
-                marginBottom:  '40px',
-              }}
-            >
+          {/* Left: section header + vertical category menu */}
+          <div style={{
+            width:         '220px',
+            flexShrink:    0,
+            padding:       '0 0 48px 56px',
+            display:       'flex',
+            flexDirection: 'column',
+          }}>
+            <p style={{
+              fontFamily:    "'Montserrat', sans-serif",
+              fontSize:      '0.6rem',
+              fontWeight:    300,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color:         'var(--gold)',
+              opacity:       0.6,
+              marginBottom:  '40px',
+            }}>
               01 — The Collection
             </p>
 
@@ -493,17 +566,14 @@ export default function Sphere() {
             </div>
           </div>
 
-          {/* Right: 3D sphere canvas */}
-          <canvas
-            ref={canvasRef}
-            className="hov"
-            style={{
-              display: 'block',
-              flex:    1,
-              height:  '780px',
-              cursor:  'none',
-            }}
-          />
+          {/* Right: three-sphere canvas */}
+          <div style={{ flex: 1, padding: '0 44px 0 0' }}>
+            <canvas
+              ref={canvasRef}
+              className="hov"
+              style={{ display: 'block', width: '100%', height: '780px', cursor: 'none' }}
+            />
+          </div>
 
         </div>
       )}

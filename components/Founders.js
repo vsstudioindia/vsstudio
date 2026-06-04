@@ -300,7 +300,7 @@ export default function Founders() {
               marginBottom:  '20px',
             }}
           >
-            04 — The Visionaries
+            03 — The Visionaries
           </p>
 
           {/* Headline */}
@@ -345,10 +345,9 @@ export default function Founders() {
               margin:     0,
             }}
           >
-            VS Studio was founded by two women who refused to let wedding
-            photography be ordinary. They brought fashion sensibility, cinematic
-            ambition, and relentless craft to every frame — and built one of
-            India's most distinctive media houses in the process.
+            VS Studio was founded by two women who refused to let wedding photography be ordinary. They brought fashion sensibility, cinematic ambition, and relentless craft to every frame, and built one of India's most distinctive media houses in the process.
+            <br /><br />
+            But beyond the aesthetics, what sets them apart is intimacy. They arrive as collaborators, becoming woven into the fabric of every family they photograph. The result is imagery that feels true.
           </p>
         </div>
       </section>

@@ -273,7 +273,7 @@ export default function WhyUs() {
               color:         'var(--gold)',
             }}
           >
-            06 — For Partners
+            05 — For Partners
           </p>
         </div>
 

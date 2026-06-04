@@ -35,7 +35,7 @@ const MOODS = {
     couples: [
       { name: 'Shristi & Umang', video: 'CUndAidphCE', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy1.jpg' },
       { name: 'Rashi & Hrithik', video: 'nR64RseSB6U', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy2.jpg' },
-      { name: 'Kritik & Karan',  video: 'Xz-x7G-vy54', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy3.jpg' },
+      { name: 'Kritika & Karan',  video: 'Xz-x7G-vy54', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy3.jpg' },
     ],
   },
 };
@@ -298,11 +298,31 @@ export default function RecordPlayer() {
   function openLightbox(video, name) {
     setLightboxVideo(video);
     setLightboxName(name);
+    const el = audioRef.current;
+    if (!el || el.paused) return;
+    clearInterval(fadeRef.current);
+    const startVol  = el.volume;
+    const fadeStart = Date.now();
+    fadeRef.current = setInterval(() => {
+      const t = Math.min(1, (Date.now() - fadeStart) / 600);
+      el.volume = startVol * (1 - t);
+      if (t >= 1) { el.volume = 0; clearInterval(fadeRef.current); }
+    }, 16);
   }
 
   function closeLightbox() {
     setLightboxVideo(null);
     setLightboxName('');
+    const el = audioRef.current;
+    if (!el || el.paused || isMutedRef.current) return;
+    clearInterval(fadeRef.current);
+    const targetVol = getVisibility() * 0.28;
+    const fadeStart = Date.now();
+    fadeRef.current = setInterval(() => {
+      const t = Math.min(1, (Date.now() - fadeStart) / 600);
+      el.volume = t * targetVol;
+      if (t >= 1) { el.volume = targetVol; clearInterval(fadeRef.current); }
+    }, 16);
   }
 
   const mood = MOODS[activeMood];

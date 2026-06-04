@@ -297,7 +297,7 @@ export default function WhyUs() {
               margin:      0,
             }}
           >
-            Why YOU should choose US.
+            Why <span style={{ color: '#c9a84c', fontStyle: 'italic' }}>you</span> should choose <span style={{ color: '#c9a84c', fontStyle: 'italic' }}>us</span>.
           </h2>
 
           {/* Right — premise + CTA */}

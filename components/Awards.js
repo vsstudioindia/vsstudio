@@ -81,13 +81,14 @@ export default function Awards() {
           <h2
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize:   'clamp(28px, 3vw, 40px)',
+              fontSize:   '25px',
               fontWeight: 200,
-              color:      '#f0ead8',
               margin:     0,
             }}
           >
-            As Recognised By.
+            <span style={{ color: '#f0ead8' }}>As </span>
+            <span style={{ color: '#c9a84c' }}>Recognised</span>
+            <span style={{ color: '#f0ead8' }}> By.</span>
           </h2>
         </div>
 

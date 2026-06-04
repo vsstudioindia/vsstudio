@@ -49,7 +49,7 @@ export default function Statement() {
 
   return (
     <section
-      id="founders"
+      id="statement"
       style={{
         position:       'relative',
         width:          '100%',

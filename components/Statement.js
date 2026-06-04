@@ -136,7 +136,7 @@ export default function Statement() {
               marginBottom: '0.15em',
             }}
           >
-            We don't take photographs.
+            We don't just take photographs.
           </p>
         </Reveal>
 

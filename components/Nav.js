@@ -3,7 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useMobile } from '../lib/useMobile';
 
-const NAV_LINKS = ['Films', 'Founders', 'Planners', 'Team'];
+const NAV_LINKS = [
+  { label: 'Photos',   href: '#showcase' },
+  { label: 'Films',    href: '#films'    },
+  { label: 'Founders', href: '#founders' },
+  { label: 'Planners', href: '#planners' },
+  { label: 'Team',     href: '#team'     },
+];
 
 export default function Nav() {
   const [scrollPct,   setScrollPct]   = useState(0);
@@ -82,10 +88,10 @@ export default function Nav() {
               transform:  'translateX(-50%)',
             }}
           >
-            {NAV_LINKS.map((label) => (
+            {NAV_LINKS.map(({ label, href }) => (
               <li key={label}>
                 <a
-                  href={`#${label.toLowerCase()}`}
+                  href={href}
                   className="hov"
                   onMouseEnter={() => setHoveredLink(label)}
                   onMouseLeave={() => setHoveredLink(null)}
@@ -186,10 +192,10 @@ export default function Nav() {
             pointerEvents:  menuOpen ? 'auto' : 'none',
           }}
         >
-          {NAV_LINKS.map((label, i) => (
+          {NAV_LINKS.map(({ label, href }, i) => (
             <a
               key={label}
-              href={`#${label.toLowerCase()}`}
+              href={href}
               onClick={() => setMenuOpen(false)}
               style={{
                 fontFamily:     "'Cormorant Garamond', serif",

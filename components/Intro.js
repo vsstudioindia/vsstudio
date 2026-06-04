@@ -3,23 +3,23 @@
 import { useEffect, useRef, useState } from 'react';
 
 /* Sequence:
-   350 ms  → show "Love."
-   2500 ms → show "Documented."
-   4600 ms → show "Forever."
-   6400 ms → show VS Studio logo mark
-   7200 ms → fade out entire intro, call onComplete
+   40 ms   → show VS Studio logo mark
+   175 ms  → show "Love."
+   1250 ms → show "Documented."
+   2300 ms → show "Forever."
+   3600 ms → fade out entire intro, call onComplete
 */
 const WORDS = [
-  { text: 'Love.',        delay: 350  },
-  { text: 'Documented.',  delay: 2500 },
-  { text: 'Forever.',     delay: 4600 },
+  { text: 'Love.',        delay: 175  },
+  { text: 'Documented.',  delay: 1250 },
+  { text: 'Forever.',     delay: 2300 },
 ];
-const LOGO_DELAY    = 6400;
-const EXIT_DELAY    = 7200;
-const WORD_DURATION = 1800; /* ms each word is visible before it fades */
+const LOGO_DELAY    = 40;
+const EXIT_DELAY    = 3600;
+const WORD_DURATION = 900; /* ms each word is visible before it fades */
 
 export default function Intro({ onComplete }) {
-  const [activeWord, setActiveWord] = useState(null); /* index or null */
+  const [revealedWords, setRevealedWords] = useState(new Set());
   const [showLogo,   setShowLogo]   = useState(false);
   const [exiting,    setExiting]    = useState(false);
   const timers = useRef([]);
@@ -27,7 +27,7 @@ export default function Intro({ onComplete }) {
   const skip = () => {
     timers.current.forEach(clearTimeout);
     setExiting(true);
-    setTimeout(onComplete, 600);
+    setTimeout(onComplete, 300);
   };
 
   useEffect(() => {
@@ -37,16 +37,15 @@ export default function Intro({ onComplete }) {
       return id;
     };
 
-    /* Show each word, then fade it after WORD_DURATION */
+    /* Reveal each word in sequence — words stay visible once shown */
     WORDS.forEach((w, i) => {
-      t(() => setActiveWord(i), w.delay);
-      t(() => setActiveWord(null), w.delay + WORD_DURATION);
+      t(() => setRevealedWords((prev) => new Set([...prev, i])), w.delay);
     });
 
     t(() => setShowLogo(true),  LOGO_DELAY);
     t(() => {
       setExiting(true);
-      t(onComplete, 600); /* wait for CSS fade-out */
+      t(onComplete, 300); /* wait for CSS fade-out */
     }, EXIT_DELAY);
 
     return () => timers.current.forEach(clearTimeout);
@@ -54,17 +53,16 @@ export default function Intro({ onComplete }) {
 
   /* ── Shared word style ── */
   const wordStyle = (visible) => ({
-    position:   'absolute',
     fontFamily: "'Cormorant Garamond', serif",
     fontStyle:  'italic',
     fontWeight: 300,
-    fontSize:   'clamp(3rem, 8vw, 7.5rem)',
+    fontSize:   '30px',
     color:      'var(--ivory)',
     letterSpacing: '-0.02em',
     opacity:    visible ? 1 : 0,
     filter:     visible ? 'blur(0px)' : 'blur(12px)',
     transform:  visible ? 'translateY(0)' : 'translateY(24px)',
-    transition: 'opacity 0.7s ease, filter 0.7s ease, transform 0.7s ease',
+    transition: 'opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease',
     userSelect: 'none',
     pointerEvents: 'none',
     whiteSpace: 'nowrap',
@@ -81,23 +79,18 @@ export default function Intro({ onComplete }) {
         justifyContent: 'center',
         zIndex:         1000,
         opacity:        exiting ? 0 : 1,
-        transition:     'opacity 0.6s ease',
+        transition:     'opacity 0.3s ease',
       }}
     >
       {/* Word stage */}
-      <div style={{ position: 'relative', width: '100%', textAlign: 'center' }}>
-        {WORDS.map((w, i) => (
-          <span key={w.text} style={wordStyle(activeWord === i)}>
-            {w.text}
-          </span>
-        ))}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem' }}>
 
         {/* VS Studio logotype */}
         <div
           style={{
             opacity:    showLogo ? 1 : 0,
             transform:  showLogo ? 'translateY(0)' : 'translateY(16px)',
-            transition: 'opacity 0.8s ease, transform 0.8s ease',
+            transition: 'opacity 0.4s ease, transform 0.4s ease',
           }}
         >
           <img
@@ -106,6 +99,16 @@ export default function Intro({ onComplete }) {
             style={{ height: '64px', width: 'auto', display: 'block', margin: '0 auto' }}
           />
         </div>
+
+        {/* Words row */}
+        <div style={{ display: 'flex', gap: '0.5em', justifyContent: 'center', alignItems: 'baseline', flexWrap: 'wrap' }}>
+          {WORDS.map((w, i) => (
+            <span key={w.text} style={wordStyle(revealedWords.has(i))}>
+              {w.text}
+            </span>
+          ))}
+        </div>
+
       </div>
 
       {/* Skip button — bottom right */}

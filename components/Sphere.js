@@ -3,21 +3,38 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMobile } from '../lib/useMobile';
 
-const IMAGE_PATHS = [
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere1.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere2.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/sphere3.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere4.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere5.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere6.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465745/sphere7.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere8.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere9.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere10.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere11.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere12.jpg',
-];
+const CDN = 'https://res.cloudinary.com/drn6x6hbd/image/upload/';
 
+const CATEGORIES = [
+  {
+    key:    'editorial',
+    label:  'Editorial',
+    images: [
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere1.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere2.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/sphere3.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere4.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere5.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere6.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465745/sphere7.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere8.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere9.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere10.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere11.jpg',
+      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere12.jpg',
+    ],
+  },
+  {
+    key:    'friends',
+    label:  'Friends & Family',
+    images: Array.from({ length: 12 }, (_, i) => `${CDN}ff${i + 1}.jpg`),
+  },
+  {
+    key:    'storytelling',
+    label:  'Story-telling',
+    images: [`${CDN}story1.jpg`, `${CDN}story2.jpg`, `${CDN}story3.jpg`],
+  },
+];
 
 const R   = 280; /* sphere radius */
 const FOV = 900; /* perspective distance */
@@ -48,50 +65,55 @@ export default function Sphere() {
     lastMX: 0,  lastMY: 0,
     hoveredNode: -1,
     mouseX: -9999, mouseY: -9999,
-    targetRotX: null, targetRotY: null, /* set on click; cleared when reached */
+    targetRotX: null, targetRotY: null,
   });
-  const imagesRef  = useRef([]);
-  const rafRef     = useRef(null);
-  const [loaded,  setLoaded]  = useState(false);
+  const imagesRef    = useRef([]);
+  const rafRef       = useRef(null);
+  const [activeCategory, setActiveCategory] = useState('editorial');
+  const [imagesVersion,  setImagesVersion]  = useState(0);
   const isMobile = useMobile();
 
-  /* ── Pre-load all images once ─────────────────────────────────────────── */
+  const activeCat = CATEGORIES.find((c) => c.key === activeCategory);
+
+  /* ── Load images whenever category changes ───────────────────────────────── */
   useEffect(() => {
     let done = 0;
-    const imgs = IMAGE_PATHS.map((src, i) => {
+    const paths = activeCat.images;
+    const imgs = paths.map((src) => {
       const img = new Image();
       img.src = src;
       img.onload = () => {
         console.log('Loaded successfully:', img.src);
         done++;
-        if (done === IMAGE_PATHS.length) setLoaded(true);
+        if (done === paths.length) { imagesRef.current = imgs; setImagesVersion((v) => v + 1); }
       };
       img.onerror = () => {
         console.log('FAILED to load:', img.src);
         done++;
-        if (done === IMAGE_PATHS.length) setLoaded(true);
+        if (done === paths.length) { imagesRef.current = imgs; setImagesVersion((v) => v + 1); }
       };
       return img;
     });
-    imagesRef.current = imgs;
-  }, []);
+  }, [activeCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── Main canvas loop ─────────────────────────────────────────────────── */
+  /* ── Main canvas loop — restarts whenever images change ─────────────────── */
   useEffect(() => {
-    if (!loaded) return;
+    if (imagesVersion === 0) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const s   = stateRef.current;
 
-    /* Node geometry — computed once */
-    const nodes = IMAGE_PATHS.map((_, i) => {
-      const { ox, oy, oz } = fibonacciNode(i, IMAGE_PATHS.length);
+    /* Node geometry — computed once per image set */
+    const imgs  = imagesRef.current;
+    const count = imgs.length;
+    const nodes = imgs.map((_, i) => {
+      const { ox, oy, oz } = fibonacciNode(i, count);
       return {
         ox: ox * R, oy: oy * R, oz: oz * R,
         w:  180 + (i % 3) * 40,
         h:  240 + (i % 4) * 30,
-        img: imagesRef.current[i],
+        img: imgs[i],
         index: i,
       };
     });
@@ -354,71 +376,153 @@ export default function Sphere() {
       canvas.removeEventListener('touchmove',  onTouchMove);
       canvas.removeEventListener('touchend',   onTouchEnd);
     };
-  }, [loaded]);
+  }, [imagesVersion]);
+
+  /* ── Shared category button style ───────────────────────────────────────── */
+  const catBtnStyle = (key, vertical) => ({
+    background:    'none',
+    border:        'none',
+    padding:       vertical ? '12px 0 12px 16px' : '0 0 12px',
+    borderLeft:    vertical
+      ? (key === activeCategory ? '2px solid #c9a84c' : '2px solid transparent')
+      : 'none',
+    borderBottom:  vertical
+      ? 'none'
+      : (key === activeCategory ? '1px solid #c9a84c' : '1px solid transparent'),
+    marginBottom:  vertical ? 0 : '-1px',
+    fontFamily:    "'Montserrat', sans-serif",
+    fontSize:      '9px',
+    letterSpacing: '0.22em',
+    textTransform: 'uppercase',
+    cursor:        'pointer',
+    color:         key === activeCategory ? '#c9a84c' : 'var(--ivory)',
+    opacity:       key === activeCategory ? 1 : 0.4,
+    textAlign:     vertical ? 'left' : 'center',
+    transition:    'opacity 0.4s ease, color 0.4s ease, border-color 0.4s ease',
+    whiteSpace:    'nowrap',
+  });
 
   return (
     <section
       id="showcase"
       style={{ background: 'var(--black2)', paddingTop: isMobile ? '72px' : '110px' }}
     >
-      {/* Section header */}
-      <div style={{ padding: isMobile ? '0 24px 32px' : '0 56px 48px' }}>
-        <p
-          style={{
-            fontFamily:    "'Montserrat', sans-serif",
-            fontSize:      '0.6rem',
-            fontWeight:    300,
-            letterSpacing: '0.28em',
-            textTransform: 'uppercase',
-            color:         'var(--gold)',
-            opacity:       0.6,
-            marginBottom:  '16px',
-          }}
-        >
-          01 — Editorial Showcase
-        </p>
-      </div>
-
-      {/* Mobile: 2-column image grid — desktop canvas untouched */}
       {isMobile ? (
-        <div
-          style={{
-            display:             'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap:                 '2px',
-          }}
-        >
-          {IMAGE_PATHS.map((src, i) => (
-            <div
-              key={i}
-              style={{ aspectRatio: '3/4', overflow: 'hidden' }}
+        <>
+          {/* Mobile: header */}
+          <div style={{ padding: '0 24px 20px' }}>
+            <p
+              style={{
+                fontFamily:    "'Montserrat', sans-serif",
+                fontSize:      '0.6rem',
+                fontWeight:    300,
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color:         'var(--gold)',
+                opacity:       0.6,
+              }}
             >
-              <img
-                src={src}
-                alt=""
-                loading="lazy"
-                style={{
-                  display:    'block',
-                  width:      '100%',
-                  height:     '100%',
-                  objectFit:  'cover',
-                  filter:     'brightness(0.85) saturate(0.88)',
-                }}
-              />
-            </div>
-          ))}
-        </div>
+              01 — The Collection
+            </p>
+          </div>
+
+          {/* Mobile: horizontal category tabs */}
+          <div
+            style={{
+              display:      'flex',
+              gap:          '28px',
+              padding:      '0 24px',
+              borderBottom: '1px solid rgba(255,255,255,0.05)',
+              marginBottom: '28px',
+              overflowX:    'auto',
+            }}
+          >
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                style={catBtnStyle(cat.key, false)}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile: image grid for active category */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+            {activeCat.images.map((src, i) => (
+              <div key={i} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
+                <img
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  style={{
+                    display:   'block',
+                    width:     '100%',
+                    height:    '100%',
+                    objectFit: 'cover',
+                    filter:    'brightness(0.85) saturate(0.88)',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
-        <canvas
-          ref={canvasRef}
-          className="hov"
-          style={{
-            display: 'block',
-            width:   '100%',
-            height:  '780px',
-            cursor:  'none',
-          }}
-        />
+        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+
+          {/* Left: header + vertical category menu */}
+          <div
+            style={{
+              width:         '220px',
+              flexShrink:    0,
+              padding:       '0 0 48px 56px',
+              display:       'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <p
+              style={{
+                fontFamily:    "'Montserrat', sans-serif",
+                fontSize:      '0.6rem',
+                fontWeight:    300,
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color:         'var(--gold)',
+                opacity:       0.6,
+                marginBottom:  '40px',
+              }}
+            >
+              01 — The Collection
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.key}
+                  className="hov"
+                  onClick={() => setActiveCategory(cat.key)}
+                  style={catBtnStyle(cat.key, true)}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: 3D sphere canvas */}
+          <canvas
+            ref={canvasRef}
+            className="hov"
+            style={{
+              display: 'block',
+              flex:    1,
+              height:  '780px',
+              cursor:  'none',
+            }}
+          />
+
+        </div>
       )}
     </section>
   );

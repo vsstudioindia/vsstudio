@@ -151,9 +151,8 @@ export default function Hero() {
           </h1>
 
           <p className="hero-sub">
-            We don't just document weddings — we craft intimate cinematic portraits
-            of the love that will outlast every season. Destination. Bespoke.
-            Unforgettable.
+            We craft intimate cinematic portraits of the love and emotions that will
+            outlast every season. Bespoke. Unforgettable. Larger than life.
           </p>
 
           <a href="#films" className="btn-primary hov" style={{ alignSelf: 'flex-start' }}>

@@ -36,7 +36,7 @@ const CATEGORIES = [
   },
 ];
 
-const R   = 280; /* sphere radius */
+const R   = 360; /* sphere radius */
 const FOV = 900; /* perspective distance */
 
 function fibonacciNode(i, total) {
@@ -111,8 +111,8 @@ export default function Sphere() {
       const { ox, oy, oz } = fibonacciNode(i, count);
       return {
         ox: ox * R, oy: oy * R, oz: oz * R,
-        w:  180 + (i % 3) * 40,
-        h:  240 + (i % 4) * 30,
+        w:  270 + (i % 3) * 60,
+        h:  360 + (i % 4) * 45,
         img: imgs[i],
         index: i,
       };
@@ -130,7 +130,7 @@ export default function Sphere() {
 
         const depth  = (z + R) / (2 * R);               /* 0 (back) … 1 (front) */
         const scale  = FOV / (FOV + z);
-        const sx     = W / 2 + x * scale;
+        const sx     = W / 2 - W * 0.1 + x * scale;
         const sy     = H / 2 + y * scale;
         return { ...n, sx, sy, z, scale, depth };
       });
@@ -170,26 +170,22 @@ export default function Sphere() {
         ctx.rect(-w / 2, -h / 2, w, h);
         ctx.clip();
 
-        /* Image — object-fit cover via 9-param drawImage */
+        /* Image — object-fit contain via 9-param drawImage */
         ctx.filter = `brightness(${brightness}) saturate(0.88)${blur > 0 ? ` blur(${blur.toFixed(1)}px)` : ''}`;
         if (n.img.complete && n.img.naturalWidth > 0) {
           const imgRatio  = n.img.naturalWidth / n.img.naturalHeight;
           const cardRatio = w / h;
-          let sx, sy, sWidth, sHeight;
+          let drawW, drawH;
           if (imgRatio > cardRatio) {
-            /* Image wider than card — fit height, crop width */
-            sHeight = n.img.naturalHeight;
-            sWidth  = sHeight * cardRatio;
-            sx      = (n.img.naturalWidth - sWidth) / 2;
-            sy      = 0;
+            /* Image wider than card — fit width, letterbox top/bottom */
+            drawW = w;
+            drawH = w / imgRatio;
           } else {
-            /* Image taller than card — fit width, crop height */
-            sWidth  = n.img.naturalWidth;
-            sHeight = sWidth / cardRatio;
-            sx      = 0;
-            sy      = (n.img.naturalHeight - sHeight) / 2;
+            /* Image taller than card — fit height, letterbox left/right */
+            drawH = h;
+            drawW = h * imgRatio;
           }
-          ctx.drawImage(n.img, sx, sy, sWidth, sHeight, -w / 2, -h / 2, w, h);
+          ctx.drawImage(n.img, 0, 0, n.img.naturalWidth, n.img.naturalHeight, -drawW / 2, -drawH / 2, drawW, drawH);
         } else {
           ctx.fillStyle = '#111';
           ctx.fillRect(-w / 2, -h / 2, w, h);
@@ -203,19 +199,6 @@ export default function Sphere() {
             ctx.fillStyle = `rgba(6,6,6,${vigAlpha.toFixed(3)})`;
             ctx.fillRect(-w / 2, -h / 2, w, h);
           }
-        }
-
-        /* Gold border + shadow on hovered card */
-        if (isHov) {
-          ctx.restore();
-          ctx.save();
-          ctx.translate(n.sx, n.sy);
-          ctx.shadowColor  = 'rgba(201,168,76,0.35)';
-          ctx.shadowBlur   = 32;
-          ctx.strokeStyle  = '#c9a84c';
-          ctx.lineWidth    = 1.5;
-          ctx.strokeRect(-w / 2, -h / 2, w, h);
-          ctx.shadowBlur   = 0;
         }
 
         ctx.restore();

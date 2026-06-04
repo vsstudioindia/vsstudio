@@ -8,7 +8,6 @@ import Hero      from '@/components/Hero';
 import Statement from '@/components/Statement';
 import Sphere       from '@/components/Sphere';
 import RecordPlayer from '@/components/RecordPlayer';
-import Story        from '@/components/Story';
 import Founders  from '@/components/Founders';
 import Canon     from '@/components/Canon';
 import Awards    from '@/components/Awards';
@@ -34,7 +33,6 @@ export default function Home() {
             <Statement />
             <Sphere />
             <RecordPlayer />
-            <Story />
             <Founders />
             <Canon />
             <Awards />

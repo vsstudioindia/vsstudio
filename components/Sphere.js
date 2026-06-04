@@ -32,7 +32,7 @@ const CATEGORIES = [
   {
     key:    'storytelling',
     label:  'Story-telling',
-    images: [`${CDN}story1.jpg`, `${CDN}story2.jpg`, `${CDN}story3.jpg`],
+    images: Array.from({ length: 12 }, (_, i) => `${CDN}story${i + 1}.jpg`),
   },
 ];
 

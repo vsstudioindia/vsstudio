@@ -11,9 +11,12 @@ const MOODS = {
     lO: '#0a0f1e', lI: '#3a5080', lF: '#c8d8f8', lT: 'CINEMATIC',
     audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518316/ambient-cinematic.wav',
     couples: [
-      { name: 'Mansi & Pankaj',   video: 'SauwDq7GAuI', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic1.jpg' },
-      { name: 'Anika & Lokesh',   video: '9BaKgjS0Ojo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic2.jpg' },
-      { name: 'Tanvi & Pratik',   video: 'K9liiclj-nQ', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic3.jpg' },
+      { name: 'Akshita & Roshan',   video: 'Woa-O8oi6Zo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic1.jpg' },
+      { name: 'Tanishqa & Yash',    video: 'rSQYZdmwiFM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic2.jpg' },
+      { name: 'Simran & Aadish',    video: 'vD2K6CffpGg', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic3.jpg' },
+      { name: 'Shristy & Umang',    video: 'ZCWoL_Wjt7g', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic4.jpg' },
+      { name: 'Vedika & Shridhar',  video: 'KcicnzeTNEI', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic5.jpg' },
+      { name: 'Divesh & Atulan',    video: 'Q0KLAqOCQKU', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic6.jpg' },
     ],
   },
   crazy: {
@@ -46,10 +49,21 @@ const GROOVE_RINGS = Array.from({ length: 17 }, (_, i) => ({
   sw: (1.2   - i * 0.0375 ).toFixed(2),
 }));
 
+/* 3-card layout — used by Fun & Crazy and Dreamy */
 const CARD_CONFIG = [
-  { top: 0,   left: 0,   anim: 'fa 5.5s ease-in-out infinite'       },
-  { top: 76,  left: 148, anim: 'fb 4.8s ease-in-out -0.8s infinite' },
-  { top: 168, left: 24,  anim: 'fc 6s   ease-in-out -2s   infinite' },
+  { top: 0,   left: 0,   anim: 'fa 5.5s ease-in-out infinite'        },
+  { top: 76,  left: 148, anim: 'fb 4.8s ease-in-out -0.8s infinite'  },
+  { top: 168, left: 24,  anim: 'fc 6s   ease-in-out -2s   infinite'  },
+];
+
+/* 6-card layout — 2 rows of 3, slight organic offsets, no full overlap */
+const CARD_CONFIG_6 = [
+  { top: 0,   left: 0,   anim: 'fa 5.5s ease-in-out infinite'        },
+  { top: 20,  left: 203, anim: 'fb 4.8s ease-in-out -0.8s infinite'  },
+  { top: 8,   left: 406, anim: 'fc 6s   ease-in-out -2s   infinite'  },
+  { top: 196, left: 8,   anim: 'fd 5.2s ease-in-out -1.5s infinite'  },
+  { top: 184, left: 206, anim: 'fe 4.5s ease-in-out -3.2s infinite'  },
+  { top: 198, left: 402, anim: 'ff 6.2s ease-in-out -0.7s infinite'  },
 ];
 
 /* ─────────────────────────────── AlbumCard ───────────────────────────────── */
@@ -69,6 +83,9 @@ function AlbumCard({ couple, cfg, acColor, moodLabel, onClick, isMobile }) {
         height:       isMobile ? '200px' : '168px',
         borderRadius: '3px',
         overflow:     'hidden',
+        opacity:      1,
+        zIndex:       25,
+        background:   '#111',
         cursor:       isMobile ? 'pointer' : 'none',
         animation:    isMobile ? 'none' : cfg.anim,
         outline:      hov ? `1px solid ${acColor}` : '1px solid transparent',
@@ -267,14 +284,16 @@ export default function RecordPlayer() {
         el.src    = MOODS[key].audio;
         el.volume = 0;
         el.load();
-        el.play().catch(console.log);
-        const targetVol = getVisibility() * 0.28;
-        const inStart   = Date.now();
-        fadeRef.current = setInterval(() => {
-          const t2 = Math.min(1, (Date.now() - inStart) / 500);
-          el.volume = t2 * targetVol;
-          if (t2 >= 1) clearInterval(fadeRef.current);
-        }, 16);
+        if (!isMutedRef.current) {
+          el.play().catch(console.log);
+          const targetVol = getVisibility() * 0.28;
+          const inStart   = Date.now();
+          fadeRef.current = setInterval(() => {
+            const t2 = Math.min(1, (Date.now() - inStart) / 500);
+            el.volume = t2 * targetVol;
+            if (t2 >= 1) clearInterval(fadeRef.current);
+          }, 16);
+        }
       }
     }, 16);
   }
@@ -351,6 +370,18 @@ export default function RecordPlayer() {
           0%, 100% { transform: translateY(0px)  rotate(-0.8deg); }
           50%      { transform: translateY(-15px) rotate(1.5deg);  }
         }
+        @keyframes fd {
+          0%, 100% { transform: translateY(0px)  rotate(0.8deg);  }
+          50%      { transform: translateY(-18px) rotate(-1.0deg); }
+        }
+        @keyframes fe {
+          0%, 100% { transform: translateY(0px)  rotate(-1.2deg); }
+          50%      { transform: translateY(-12px) rotate(0.9deg);  }
+        }
+        @keyframes ff {
+          0%, 100% { transform: translateY(0px)  rotate(0.5deg);  }
+          50%      { transform: translateY(-20px) rotate(-1.4deg); }
+        }
 
       `}</style>
 
@@ -361,7 +392,7 @@ export default function RecordPlayer() {
           position:  'relative',
           width:     '100%',
           minHeight: isMobile ? 'auto' : '100vh',
-          overflow:  isMobile ? 'visible' : 'hidden',
+          overflow:  'visible',
           background:'#060808',
           '--ac':    mood.ac,
         }}
@@ -441,7 +472,7 @@ export default function RecordPlayer() {
           right:         isMobile ? 'auto' : 0,
           top:           isMobile ? 'auto' : 0,
           bottom:        isMobile ? 'auto' : 0,
-          width:         isMobile ? '100%' : '44%',
+          width:         isMobile ? '100%' : '54%',
           zIndex:        20,
           padding:       isMobile ? '72px 24px 60px' : 'clamp(48px,6vh,80px) 64px clamp(48px,6vh,80px) 48px',
           display:       'flex',
@@ -488,23 +519,29 @@ export default function RecordPlayer() {
 
           {/* Album cards */}
           <div style={{
-            position:      isMobile ? 'relative' : 'relative',
-            height:        isMobile ? 'auto' : 'clamp(240px,30vh,340px)',
+            position:      'relative',
+            height:        isMobile ? 'auto' : mood.couples.length > 3 ? 'clamp(360px,42vh,400px)' : 'clamp(240px,30vh,340px)',
+            minWidth:      isMobile ? 'auto' : mood.couples.length > 3 ? '580px' : 'auto',
+            overflow:      'visible',
+            flexShrink:    0,
             display:       isMobile ? 'flex' : 'block',
             flexDirection: 'column',
             gap:           isMobile ? '10px' : '0',
           }}>
-            {mood.couples.map((couple, i) => (
+            {mood.couples.map((couple, i) => {
+              const cfg = mood.couples.length > 3 ? CARD_CONFIG_6[i] : CARD_CONFIG[i];
+              return (
               <AlbumCard
                 key={`${activeMood}-${i}`}
                 couple={couple}
-                cfg={CARD_CONFIG[i]}
+                cfg={cfg}
                 acColor={mood.ac}
                 moodLabel={mood.label}
                 onClick={() => openLightbox(couple.video, couple.name)}
                 isMobile={isMobile}
               />
-            ))}
+              );
+            })}
           </div>
         </div>
 

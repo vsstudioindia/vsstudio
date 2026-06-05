@@ -295,9 +295,10 @@ export default function WhyUs() {
               lineHeight:  1.05,
               color:       'var(--ivory)',
               margin:      0,
+              whiteSpace:  'nowrap',
             }}
           >
-            Why You Should Choose Us.
+            Why <em style={{ color: '#c9a84c', fontStyle: 'italic' }}>You</em> Should Choose <em style={{ color: '#c9a84c', fontStyle: 'italic' }}>Us</em>.
           </h2>
 
           {/* Right — premise + CTA */}

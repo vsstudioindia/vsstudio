@@ -9,7 +9,9 @@ const PAR_Y = 9;
 
 const IMAGES = [
   'https://res.cloudinary.com/drn6x6hbd/image/upload/hero1',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/gallery5.jpg',
   'https://res.cloudinary.com/drn6x6hbd/image/upload/hero2',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/gallery1.jpg',
   'https://res.cloudinary.com/drn6x6hbd/image/upload/hero3',
 ];
 
@@ -19,7 +21,7 @@ export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   /* One ref per image div so parallax can target only the active one */
-  const imgRefs = useRef([null, null, null]);
+  const imgRefs = useRef([null, null, null, null, null]);
 
   const parX    = useRef(0);
   const parY    = useRef(0);

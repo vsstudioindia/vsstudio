@@ -23,46 +23,46 @@ function useReveal(threshold = 0.1) {
 const VALUE_CARDS = [
   {
     num:   '01',
-    title: 'We Never Miss the Moment',
-    body:  'Multi-camera, multi-photographer coverage means every critical moment — every entrance, every tear, every look — is captured. You can promise your clients total coverage.',
-    tag:   'Zero missed moments',
-  },
-  {
-    num:   '02',
-    title: 'We Make You Look Good',
-    body:  'When clients see their photographs and films, they remember who recommended their photographer. Our work reflects directly on your curation. We make that reflection exceptional.',
-    tag:   'Your reputation, elevated',
-  },
-  {
-    num:   '03',
     title: 'Seamless On-Site Collaboration',
-    body:  "11 years working with India’s top event planners means we understand timeline, logistics, and decorum. We integrate invisibly and deliver visibly.",
+    body:  "11 years working with India's top event planners means we understand timeline, logistics, and decorum. We integrate invisibly and deliver visibly.",
     tag:   'Trusted by top planners',
   },
   {
-    num:   '04',
+    num:   '02',
     title: 'Consistent Premium Output',
     body:  "Whether it's a 50-person intimate gathering or a 1000-guest destination wedding, the VS Studio standard never wavers. Your clients always receive cinematic luxury.",
     tag:   'Guaranteed quality',
   },
   {
-    num:   '05',
-    title: 'Dedicated Planner Partnership',
-    body:  "Priority booking, co-branded collateral, and a direct line to our team. You're never just a referral to us — you're a partner with a standing relationship.",
-    tag:   'Partnership programme',
-  },
-  {
-    num:   '06',
+    num:   '03',
     title: 'Social-Ready Deliverables',
     body:  'Highlight reels, Instagram-ready cuts, and editorial selects built for sharing. Our work markets your events — and your business — for months after the wedding.',
     tag:   'Content that converts',
+  },
+  {
+    num:   '04',
+    title: 'Extensive Instagram Reach',
+    body:  'Our reels reach hundreds of thousands of engaged couples. When we feature your event, it doesn\'t just get documented — it gets seen. By exactly the kind of couples you want walking through your door.',
+    tag:   'Massive organic reach',
+  },
+  {
+    num:   '05',
+    title: 'We Make You Look Good',
+    body:  'When clients see their photographs and films, they remember who recommended their photographer. Our work reflects directly on your curation. We make that reflection exceptional.',
+    tag:   'Your reputation, elevated',
+  },
+  {
+    num:   '06',
+    title: 'Dedicated Planner Partnership',
+    body:  "Priority booking, co-branded collateral, and a direct line to our team. You're never just a referral to us — you're a partner with a standing relationship.",
+    tag:   'Partnership programme',
   },
 ];
 
 const STATS = [
   { value: '98%',  label: 'Planner recommendation rate' },
   { value: '4.9★', label: 'Average client rating'       },
-  { value: '500+', label: 'Events delivered'             },
+  { value: '500+', label: 'Weddings Delivered'            },
   { value: '11yr', label: 'Industry track record'        },
 ];
 
@@ -297,7 +297,7 @@ export default function WhyUs() {
               margin:      0,
             }}
           >
-            Why <span style={{ color: '#c9a84c', fontStyle: 'italic' }}>you</span> should choose <span style={{ color: '#c9a84c', fontStyle: 'italic' }}>us</span>.
+            Why You Should Choose Us.
           </h2>
 
           {/* Right — premise + CTA */}
@@ -314,9 +314,7 @@ export default function WhyUs() {
                 maxWidth:     '440px',
               }}
             >
-              You don't just get a photographer. You get a creative partner that makes your
-              events look extraordinary — and makes you look brilliant for recommending us.
-              Every time.
+              You don't just get a photographer. You get a creative partner who makes your events look extraordinary and makes you look brilliant for recommending us. Every time.
             </p>
           </div>
         </div>

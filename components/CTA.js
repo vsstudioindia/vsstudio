@@ -129,8 +129,7 @@ export default function CTA() {
             marginBottom: '0',
           }}
         >
-          We accept a limited number of commissions each year. Each one receives
-          our complete creative devotion.
+          We accept a limited number of weddings each year. Each one receives our complete creative devotion.
         </p>
 
         {/* Gold divider line */}

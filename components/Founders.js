@@ -166,48 +166,6 @@ function FounderCard({ src, role, name, title, bio, badge, isLast,
           </p>
         </div>
 
-        {/* Badge — appears on hover */}
-        <div
-          style={{
-            overflow:   'hidden',
-            maxHeight:  hovered ? '48px' : '0',
-            transition: 'max-height 0.5s ease 0.1s',
-          }}
-        >
-          <div
-            style={{
-              display:       'inline-flex',
-              alignItems:    'center',
-              gap:           '8px',
-              border:        '1px solid var(--gold)',
-              borderRadius:  '999px',
-              padding:       '5px 14px',
-              marginTop:     '10px',
-            }}
-          >
-            <span
-              style={{
-                width:        '5px',
-                height:       '5px',
-                borderRadius: '50%',
-                background:   'var(--gold)',
-                flexShrink:   0,
-              }}
-            />
-            <span
-              style={{
-                fontFamily:    "'Montserrat', sans-serif",
-                fontSize:      '8px',
-                fontWeight:    300,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color:         'var(--gold)',
-              }}
-            >
-              {badge}
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -407,7 +365,7 @@ export default function Founders() {
           role="Co-Founder & Story-teller"
           name="Vrinda Ganeriwala"
           title="Photographer. Story-teller. Canon Wizard."
-          bio="Vrinda doesn't just photograph weddings — she narrates them. With an eye trained across 11 years and 500+ love stories, she finds the frame that holds the entire emotion of a day. A Canon Wizard and instinctive storyteller, she has redefined what wedding photography looks like in India."
+          bio="Vrinda doesn't just photograph weddings. She narrates them. With an eye trained across 11 years and 500+ love stories, she finds the frame that holds the entire emotion of a day. A Canon Wizard and instinctive storyteller, she has redefined what wedding photography looks like in India."
           badge="Canon Wizard"
           isLast={false}
         />
@@ -415,7 +373,7 @@ export default function Founders() {
           src="https://res.cloudinary.com/drn6x6hbd/image/upload/shristi"
           role="Co-Founder & Creative Director"
           name="Shristi Dhandharia"
-          title="Photographer. Story-teller. Canon Wizard."
+          title="Photographer. Creative Director. Canon Wizard."
           bio="Shristi builds worlds out of moving images. As the cinematic force behind VS Studio, she crafts wedding films that feel less like documentation and more like memory. Her work has appeared in international bridal publications — because great cinema knows no borders."
           badge="Award-Winning Filmmaker"
           isLast={true}

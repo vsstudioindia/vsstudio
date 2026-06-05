@@ -4,8 +4,7 @@ import { useState } from 'react';
 
 const RIGHT_LINKS = [
   { label: 'Instagram', href: 'https://instagram.com/vs.studio' },
-  { label: 'Privacy',   href: '#'                                },
-  { label: 'Contact',   href: 'mailto:hello@vsstudio.in'         },
+  { label: 'Contact',   href: 'https://wa.link/xt8mtl'          },
 ];
 
 export default function Footer() {

@@ -360,7 +360,7 @@ export default function RecordPlayer() {
         style={{
           position:  'relative',
           width:     '100%',
-          height:    isMobile ? 'auto' : '100vh',
+          minHeight: isMobile ? 'auto' : '100vh',
           overflow:  isMobile ? 'visible' : 'hidden',
           background:'#060808',
           '--ac':    mood.ac,
@@ -443,7 +443,7 @@ export default function RecordPlayer() {
           bottom:        isMobile ? 'auto' : 0,
           width:         isMobile ? '100%' : '44%',
           zIndex:        20,
-          padding:       isMobile ? '72px 24px 60px' : '80px 64px 80px 48px',
+          padding:       isMobile ? '72px 24px 60px' : 'clamp(48px,6vh,80px) 64px clamp(48px,6vh,80px) 48px',
           display:       'flex',
           flexDirection: 'column',
           justifyContent:'center',
@@ -489,7 +489,7 @@ export default function RecordPlayer() {
           {/* Album cards */}
           <div style={{
             position:      isMobile ? 'relative' : 'relative',
-            height:        isMobile ? 'auto' : '340px',
+            height:        isMobile ? 'auto' : 'clamp(240px,30vh,340px)',
             display:       isMobile ? 'flex' : 'block',
             flexDirection: 'column',
             gap:           isMobile ? '10px' : '0',

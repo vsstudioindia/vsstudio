@@ -233,9 +233,9 @@ export default function Founders() {
       {/* ══ PART 1 — Full-height banner ══════════════════════════════════ */}
       <section
         ref={bannerRef}
+        className="min-h-dvh"
         style={{
           position:   'relative',
-          height:     '100vh',
           overflow:   'hidden',
           display:    'flex',
           alignItems: 'flex-end',

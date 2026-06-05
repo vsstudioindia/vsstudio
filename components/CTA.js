@@ -31,9 +31,9 @@ export default function CTA() {
   return (
     <section
       id="cta"
+      className="min-h-dvh"
       style={{
         position:       'relative',
-        minHeight:      '100vh',
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',

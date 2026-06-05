@@ -143,3 +143,16 @@ body {
   background: var(--ivory);
   transform: translateY(-2px);
 }
+
+/* ── Viewport-height utilities with dvh fallback ─────────────────────────── */
+/* dvh = dynamic viewport height — accounts for mobile browser chrome.        */
+/* The cascade trick: browsers that support dvh override the vh value.         */
+.h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.min-h-dvh {
+  min-height: 100vh;
+  min-height: 100dvh;
+}

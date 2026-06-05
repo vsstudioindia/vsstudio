@@ -247,7 +247,7 @@ export default function Canon() {
             display:        'flex',
             flexDirection:  'column',
             justifyContent: 'center',
-            padding:        isMobile ? '56px 24px' : '100px 64px',
+            padding:        isMobile ? '56px 24px' : 'clamp(56px,8vh,100px) 64px',
             background:     'var(--black2)',
           }}
         >
@@ -307,9 +307,11 @@ export default function Canon() {
           </p>
 
           {/* Signature */}
-          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '20px', color: 'var(--gold)', opacity: 0.55 }}>
-            — Vrinda &amp; Shristi
-          </p>
+          <img
+            src="https://res.cloudinary.com/drn6x6hbd/image/upload/v1780633150/Canon.png"
+            alt="Vrinda & Shristi"
+            style={{ height: 'clamp(80px, 11vw, 154px)', width: 'auto', objectFit: 'contain', alignSelf: 'flex-start', opacity: 0.55, filter: 'brightness(0) invert(1)' }}
+          />
         </div>
 
       </section>

@@ -85,10 +85,10 @@ export default function Hero() {
 
   return (
     <section
+      className="h-dvh"
       style={{
         position:   'relative',
         width:      '100%',
-        height:     '100vh',
         overflow:   'hidden',
         background: 'var(--black)',
       }}

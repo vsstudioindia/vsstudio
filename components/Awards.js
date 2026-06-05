@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const LOGOS = [
+  { src: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1780633150/Canon.png',             alt: 'Canon'                },
   { src: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779747104/weddingsutra.png',      alt: 'WeddingSutra'         },
   { src: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779747270/wow-logo.png',           alt: 'WOW Awards'           },
   { src: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779747399/iwpoty.png',             alt: 'IWPOTY'               },

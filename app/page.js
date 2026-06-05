@@ -34,8 +34,8 @@ export default function Home() {
             <Sphere />
             <RecordPlayer />
             <Founders />
-            <Canon />
             <Awards />
+            <Canon />
             <Team />
             <WhyUs />
             <CTA />

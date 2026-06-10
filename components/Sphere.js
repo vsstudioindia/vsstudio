@@ -72,15 +72,15 @@ function rotateY(x, y, z, a) {
 }
 
 export default function Sphere() {
-  const canvasRef    = useRef(null);
-  const rafRef       = useRef(null);
-  const allImagesRef = useRef({});         /* { [catKey]: Image[] } */
-  const triangleRef  = useRef({ angle: 0, targetAngle: 0 });
-  const activeCatRef = useRef(0);          /* index into CATEGORIES */
-  const mouseRef     = useRef({ x: -9999, y: -9999 });
-  const spherePosRef = useRef([]);         /* last-drawn {cx, cy, sphScale} per sphere */
+  const canvasRef      = useRef(null);
+  const rafRef         = useRef(null);
+  const allImagesRef   = useRef({});
+  const triangleRef    = useRef({ angle: 0, targetAngle: 0 });
+  const activeCatRef   = useRef(0);
+  const mouseRef       = useRef({ x: -9999, y: -9999 });
+  const spherePosRef   = useRef([]);
+  const touchStartRef  = useRef({ x: 0, y: 0 }); /* for tap detection */
 
-  /* Independent rotation state per sphere — start at different rotY so they look distinct */
   const sphereRots = useRef([
     { rotX: 0.18, rotY: 0,    velX: 0, velY: 0.003,  isDragging: false, lastMX: 0, lastMY: 0, focusedNode: -1, seekStartTime: null, seekDuration: 600, seekStartRotX: 0, seekStartRotY: 0, seekTargetRotX: 0, seekTargetRotY: 0 },
     { rotX: 0.22, rotY: 2.09, velX: 0, velY: 0.0028, isDragging: false, lastMX: 0, lastMY: 0, focusedNode: -1, seekStartTime: null, seekDuration: 600, seekStartRotX: 0, seekStartRotY: 0, seekTargetRotX: 0, seekTargetRotY: 0 },
@@ -90,8 +90,6 @@ export default function Sphere() {
   const [activeCategory, setActiveCategory] = useState('editorial');
   const [allLoaded,      setAllLoaded]      = useState(false);
   const isMobile = useMobile();
-
-  const activeCat = CATEGORIES.find((c) => c.key === activeCategory);
 
   /* ── Preload every category's images once on mount ───────────────────────── */
   useEffect(() => {
@@ -118,7 +116,6 @@ export default function Sphere() {
     const rawTarget = -idx * (2 * Math.PI / 3);
     const tr    = triangleRef.current;
     let   diff  = rawTarget - tr.angle;
-    /* Shortest path normalisation */
     while (diff >  Math.PI) diff -= 2 * Math.PI;
     while (diff < -Math.PI) diff += 2 * Math.PI;
     tr.targetAngle = tr.angle + diff;
@@ -131,19 +128,17 @@ export default function Sphere() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    /* Draw one sphere centered at (cx, cy) */
     function drawSphere(catKey, cx, cy, sphScale, alpha, isActive) {
-      const imgs = allImagesRef.current[catKey] || [];
-      const si   = CATEGORIES.findIndex((c) => c.key === catKey);
-      const sr   = sphereRots.current[si];
-      const mX   = mouseRef.current.x;
-      const mY   = mouseRef.current.y;
+      const imgs  = allImagesRef.current[catKey] || [];
+      const si    = CATEGORIES.findIndex((c) => c.key === catKey);
+      const sr    = sphereRots.current[si];
+      const mX    = mouseRef.current.x;
+      const mY    = mouseRef.current.y;
       const R_eff = R * sphScale;
 
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      /* Project all nodes for this sphere */
       const projected = BASE_NODES.map((n) => {
         let [x, y, z] = rotateX(n.ox * sphScale, n.oy * sphScale, n.oz * sphScale, sr.rotX);
         [x, y, z]     = rotateY(x, y, z, sr.rotY);
@@ -154,10 +149,8 @@ export default function Sphere() {
         return { ...n, sx, sy, z, scale, depth };
       });
 
-      /* Sort back → front */
       projected.sort((a, b) => a.z - b.z);
 
-      /* Hit-test for hover (active sphere only) */
       let hoveredNode = -1;
       if (isActive) {
         for (let i = projected.length - 1; i >= 0; i--) {
@@ -170,35 +163,28 @@ export default function Sphere() {
         }
       }
 
-      /* Draw each card */
       projected.forEach((n) => {
-        const isHov     = isActive && n.index === hoveredNode;
-        const sc        = n.scale * sphScale * (isHov ? 1.15 : 1);
-        const w         = n.w * sc;
-        const h         = n.h * sc;
+        const isHov      = isActive && n.index === hoveredNode;
+        const sc         = n.scale * sphScale * (isHov ? 1.15 : 1);
+        const w          = n.w * sc;
+        const h          = n.h * sc;
         const brightness = Math.min(1, 0.45 + n.depth * 0.55 + (isHov ? 0.2 : 0));
-        const blur      = isHov ? 0 : Math.max(0, (1 - n.depth) * 2.5);
+        const blur       = isHov ? 0 : Math.max(0, (1 - n.depth) * 2.5);
 
         ctx.save();
         ctx.translate(n.sx, n.sy);
-
-        /* Clip to card rect */
         ctx.beginPath();
         ctx.rect(-w / 2, -h / 2, w, h);
         ctx.clip();
 
-        /* Image — object-fit contain */
         ctx.filter = `brightness(${brightness}) saturate(0.88)${blur > 0 ? ` blur(${blur.toFixed(1)}px)` : ''}`;
         const img = imgs[n.index];
         if (img && img.complete && img.naturalWidth > 0) {
           const imgRatio  = img.naturalWidth / img.naturalHeight;
           const cardRatio = w / h;
           let drawW, drawH;
-          if (imgRatio > cardRatio) {
-            drawW = w; drawH = w / imgRatio;
-          } else {
-            drawH = h; drawW = h * imgRatio;
-          }
+          if (imgRatio > cardRatio) { drawW = w; drawH = w / imgRatio; }
+          else                      { drawH = h; drawW = h * imgRatio; }
           ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, -drawW / 2, -drawH / 2, drawW, drawH);
         } else {
           ctx.fillStyle = '#111';
@@ -206,7 +192,6 @@ export default function Sphere() {
         }
         ctx.filter = 'none';
 
-        /* Depth vignette on non-hovered back cards */
         if (!isHov) {
           const vigAlpha = (1 - n.depth) * 0.45;
           if (vigAlpha > 0.01) {
@@ -214,7 +199,6 @@ export default function Sphere() {
             ctx.fillRect(-w / 2, -h / 2, w, h);
           }
         }
-
         ctx.restore();
       });
 
@@ -222,29 +206,26 @@ export default function Sphere() {
     }
 
     function draw() {
-      const W  = canvas.width;
-      const H  = canvas.height;
+      const W = canvas.width;
+      const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
 
       const tr  = triangleRef.current;
       const cX  = W * 0.44;
       const cY  = H / 2;
 
-      /* Compute each sphere's triangle position this frame */
       const sphereData = CATEGORIES.map((cat, i) => {
         const phi      = tr.angle + i * (2 * Math.PI / 3);
-        const depth    = Math.cos(phi);              /* +1 = front, -1 = back */
+        const depth    = Math.cos(phi);
         const cx       = cX + Math.sin(phi) * T_H;
-        const sphScale = 0.45 + 0.55 * (depth + 1) / 2; /* 0.45 … 1.0 */
-        const alpha    = 0.40 + 0.60 * (depth + 1) / 2; /* 0.40 … 1.0 */
+        const sphScale = 0.45 + 0.55 * (depth + 1) / 2;
+        const alpha    = 0.40 + 0.60 * (depth + 1) / 2;
         const isActive = i === activeCatRef.current;
         return { catKey: cat.key, cx, cy: cY, sphScale, alpha, isActive, depth };
       });
 
-      /* Store positions for event hit-testing */
       spherePosRef.current = sphereData.map(({ cx, cy, sphScale }, i) => ({ cx, cy, sphScale, index: i }));
 
-      /* Draw back → front */
       sphereData
         .slice()
         .sort((a, b) => a.depth - b.depth)
@@ -255,11 +236,8 @@ export default function Sphere() {
 
     function tick() {
       const tr = triangleRef.current;
-
-      /* Lerp triangle toward target */
       tr.angle += (tr.targetAngle - tr.angle) * LERP;
 
-      /* Rotate each sphere: drag → seek → auto-rotate */
       sphereRots.current.forEach((sr) => {
         if (sr.isDragging) {
           sr.rotY += sr.velY;
@@ -308,6 +286,53 @@ export default function Sphere() {
       return hitIdx;
     }
 
+    /* ── Shared card-select logic (used by click and tap) ─────────────────── */
+    function triggerCardSelect(mx, my) {
+      const sphIdx = hitSphere(mx, my);
+      if (sphIdx < 0) return;
+
+      const sr  = sphereRots.current[sphIdx];
+      const pos = spherePosRef.current[sphIdx];
+      const { cx, cy, sphScale } = pos;
+
+      const projected = BASE_NODES.map((n) => {
+        let [x, y, z] = rotateX(n.ox * sphScale, n.oy * sphScale, n.oz * sphScale, sr.rotX);
+        [x, y, z]     = rotateY(x, y, z, sr.rotY);
+        const scale   = FOV / (FOV + z);
+        return { ...n, sx: cx + x * scale, sy: cy + y * scale, z, scale };
+      });
+      projected.sort((a, b) => b.z - a.z);
+
+      let hitNode = null;
+      for (const n of projected) {
+        const hw = (n.w * n.scale * sphScale) / 2;
+        const hh = (n.h * n.scale * sphScale) / 2;
+        if (mx >= n.sx - hw && mx <= n.sx + hw && my >= n.sy - hh && my <= n.sy + hh) {
+          hitNode = n; break;
+        }
+      }
+
+      if (!hitNode || sr.focusedNode === hitNode.index) {
+        sr.focusedNode   = -1;
+        sr.seekStartTime = null;
+        return;
+      }
+
+      const ux = hitNode.ox / R;
+      const uy = hitNode.oy / R;
+      const uz = hitNode.oz / R;
+      let dY   = Math.atan2(-ux, uz) - (sr.rotY % (2 * Math.PI));
+      if (dY >  Math.PI) dY -= 2 * Math.PI;
+      if (dY < -Math.PI) dY += 2 * Math.PI;
+
+      sr.focusedNode    = hitNode.index;
+      sr.seekStartRotX  = sr.rotX;
+      sr.seekStartRotY  = sr.rotY;
+      sr.seekTargetRotX = -Math.asin(uy);
+      sr.seekTargetRotY = sr.rotY + dY;
+      sr.seekStartTime  = performance.now();
+    }
+
     /* ── Mouse interaction ─────────────────────────────────────────────── */
     let wasDragging = false;
 
@@ -336,60 +361,10 @@ export default function Sphere() {
       sr.lastMX     = e.clientX;
       sr.lastMY     = e.clientY;
     }
-
     function onClick(e) {
       if (wasDragging) return;
       const rect = canvas.getBoundingClientRect();
-      const mx   = e.clientX - rect.left;
-      const my   = e.clientY - rect.top;
-
-      /* Find which sphere was clicked */
-      const sphIdx = hitSphere(mx, my);
-      if (sphIdx < 0) return;
-
-      const sr  = sphereRots.current[sphIdx];
-      const pos = spherePosRef.current[sphIdx];
-      const { cx, cy, sphScale } = pos;
-
-      /* Project cards of that sphere and hit-test */
-      const projected = BASE_NODES.map((n) => {
-        let [x, y, z] = rotateX(n.ox * sphScale, n.oy * sphScale, n.oz * sphScale, sr.rotX);
-        [x, y, z]     = rotateY(x, y, z, sr.rotY);
-        const scale   = FOV / (FOV + z);
-        return { ...n, sx: cx + x * scale, sy: cy + y * scale, z, scale };
-      });
-      projected.sort((a, b) => b.z - a.z);
-
-      let hitNode = null;
-      for (const n of projected) {
-        const hw = (n.w * n.scale * sphScale) / 2;
-        const hh = (n.h * n.scale * sphScale) / 2;
-        if (mx >= n.sx - hw && mx <= n.sx + hw && my >= n.sy - hh && my <= n.sy + hh) {
-          hitNode = n; break;
-        }
-      }
-
-      /* Clicking empty space or re-clicking focused card → unfocus */
-      if (!hitNode || sr.focusedNode === hitNode.index) {
-        sr.focusedNode   = -1;
-        sr.seekStartTime = null;
-        return;
-      }
-
-      /* Compute target rotation to bring clicked card front-center */
-      const ux = hitNode.ox / R;
-      const uy = hitNode.oy / R;
-      const uz = hitNode.oz / R;
-      let dY   = Math.atan2(-ux, uz) - (sr.rotY % (2 * Math.PI));
-      if (dY >  Math.PI) dY -= 2 * Math.PI;
-      if (dY < -Math.PI) dY += 2 * Math.PI;
-
-      sr.focusedNode    = hitNode.index;
-      sr.seekStartRotX  = sr.rotX;
-      sr.seekStartRotY  = sr.rotY;
-      sr.seekTargetRotX = -Math.asin(uy);
-      sr.seekTargetRotY = sr.rotY + dY;
-      sr.seekStartTime  = performance.now();
+      triggerCardSelect(e.clientX - rect.left, e.clientY - rect.top);
     }
     function onMouseUp() {
       sphereRots.current.forEach((sr) => { sr.isDragging = false; });
@@ -404,6 +379,7 @@ export default function Sphere() {
     function onTouchStart(e) {
       const rect = canvas.getBoundingClientRect();
       const t    = e.touches[0];
+      touchStartRef.current = { x: t.clientX, y: t.clientY };
       const idx  = hitSphere(t.clientX - rect.left, t.clientY - rect.top);
       const sr   = sphereRots.current[idx >= 0 ? idx : activeCatRef.current];
       sr.isDragging = true;
@@ -424,8 +400,16 @@ export default function Sphere() {
         }
       });
     }
-    function onTouchEnd() {
+    function onTouchEnd(e) {
+      const t  = e.changedTouches[0];
+      const dx = t.clientX - touchStartRef.current.x;
+      const dy = t.clientY - touchStartRef.current.y;
       sphereRots.current.forEach((sr) => { sr.isDragging = false; });
+      /* Tap: minimal movement → trigger card select */
+      if (Math.sqrt(dx * dx + dy * dy) < 10) {
+        const rect = canvas.getBoundingClientRect();
+        triggerCardSelect(t.clientX - rect.left, t.clientY - rect.top);
+      }
     }
 
     canvas.addEventListener('mousemove',  onMouseMove);
@@ -435,7 +419,7 @@ export default function Sphere() {
     canvas.addEventListener('click',      onClick);
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
     canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
-    canvas.addEventListener('touchend',   onTouchEnd);
+    canvas.addEventListener('touchend',   onTouchEnd,   { passive: true });
 
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -451,28 +435,30 @@ export default function Sphere() {
     };
   }, [allLoaded]);
 
-  /* ── Category button style (same as before) ──────────────────────────────── */
+  /* ── Category button style ───────────────────────────────────────────────── */
   const catBtnStyle = (key, vertical) => ({
-    background:    'none',
-    border:        'none',
-    padding:       vertical ? '12px 0 12px 16px' : '0 0 12px',
-    borderLeft:    vertical
+    background:      'none',
+    border:          'none',
+    padding:         vertical ? '12px 0 12px 16px' : '0 0 10px',
+    borderLeft:      vertical
       ? (key === activeCategory ? '2px solid #c9a84c' : '2px solid transparent')
       : 'none',
-    borderBottom:  vertical
+    borderBottom:    vertical
       ? 'none'
       : (key === activeCategory ? '1px solid #c9a84c' : '1px solid transparent'),
-    marginBottom:  vertical ? 0 : '-1px',
-    fontFamily:    "'Montserrat', sans-serif",
-    fontSize:      '9px',
-    letterSpacing: '0.22em',
-    textTransform: 'uppercase',
-    cursor:        'pointer',
-    color:         key === activeCategory ? '#c9a84c' : 'var(--ivory)',
-    opacity:       key === activeCategory ? 1 : 0.4,
-    textAlign:     vertical ? 'left' : 'center',
-    transition:    'opacity 0.4s ease, color 0.4s ease, border-color 0.4s ease',
-    whiteSpace:    'nowrap',
+    marginBottom:    vertical ? 0 : '-1px',
+    fontFamily:      "'Montserrat', sans-serif",
+    fontSize:        '9px',
+    letterSpacing:   key === activeCategory ? '0.28em' : '0.22em',
+    textTransform:   'uppercase',
+    cursor:          'pointer',
+    color:           key === activeCategory ? '#c9a84c' : 'var(--ivory)',
+    opacity:         key === activeCategory ? 1 : 0.4,
+    textAlign:       vertical ? 'left' : 'center',
+    transform:       key === activeCategory ? 'scale(1.12)' : 'scale(1)',
+    transformOrigin: vertical ? 'left center' : 'center bottom',
+    transition:      'opacity 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease',
+    whiteSpace:      'nowrap',
   });
 
   return (
@@ -497,7 +483,7 @@ export default function Sphere() {
             </p>
           </div>
 
-          {/* Mobile: horizontal category tabs */}
+          {/* Mobile: horizontal category tabs with gold dot indicator */}
           <div style={{
             display:      'flex',
             gap:          '28px',
@@ -507,26 +493,30 @@ export default function Sphere() {
             overflowX:    'auto',
           }}>
             {CATEGORIES.map((cat) => (
-              <button key={cat.key} onClick={() => setActiveCategory(cat.key)} style={catBtnStyle(cat.key, false)}>
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Mobile: active category image grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-            {activeCat.images.map((src, i) => (
-              <div key={i} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
-                <img src={src} alt="" loading="lazy" style={{
-                  display:   'block',
-                  width:     '100%',
-                  height:    '100%',
-                  objectFit: 'cover',
-                  filter:    'brightness(0.85) saturate(0.88)',
+              <div key={cat.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <button onClick={() => setActiveCategory(cat.key)} style={catBtnStyle(cat.key, false)}>
+                  {cat.label}
+                </button>
+                {/* Glowing dot beneath active tab */}
+                <div style={{
+                  width:        '4px',
+                  height:       '4px',
+                  borderRadius: '50%',
+                  background:   '#c9a84c',
+                  marginTop:    '4px',
+                  opacity:      cat.key === activeCategory ? 1 : 0,
+                  boxShadow:    cat.key === activeCategory ? '0 0 8px rgba(201,168,76,0.8)' : 'none',
+                  transition:   'opacity 0.3s ease, box-shadow 0.3s ease',
                 }} />
               </div>
             ))}
           </div>
+
+          {/* Mobile: canvas sphere — touch drag and tap to select */}
+          <canvas
+            ref={canvasRef}
+            style={{ display: 'block', width: '100%', height: '780px', touchAction: 'none' }}
+          />
         </>
       ) : (
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>

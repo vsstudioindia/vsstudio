@@ -13,7 +13,7 @@ const MOODS = {
     couples: [
       { name: 'Akshita & Roshan',   video: 'Woa-O8oi6Zo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic1.jpg' },
       { name: 'Tanishqa & Yash',    video: 'rSQYZdmwiFM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic2.jpg' },
-      { name: 'Simran & Aadish',    video: 'vD2K6CffpGg', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic3.jpg' },
+      { name: 'Simran & Aadish',    video: 'vD2K6CffpGg', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781415460/cinematic3.jpg' },
       { name: 'Shristy & Umang',    video: 'ZCWoL_Wjt7g', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic4.jpg' },
       { name: 'Vedika & Shridhar',  video: 'KcicnzeTNEI', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic5.jpg' },
       { name: 'Divesh & Atulan',    video: 'Q0KLAqOCQKU', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic6.jpg' },

@@ -33,15 +33,15 @@ const MOODS = {
       { name: 'Vidhi & Rishab',               video: 't0zvfeK8-Gs',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781421855/crazy6.jpg' },
     ],
   },
-  dreamy: {
-    label: 'Dreamy', word: 'dream.',
+  storytelling: {
+    label: 'Story-telling', word: 'dream.',
     ac: '#3a9088', rgb: '58,144,136',
-    lO: '#041412', lI: '#175850', lF: '#b8f0ec', lT: 'DREAMY',
+    lO: '#041412', lI: '#175850', lF: '#b8f0ec', lT: 'STORY-TELLING',
     audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518675/ambient-dreamy.wav',
     couples: [
-      { name: 'Shristi & Umang', video: 'CUndAidphCE', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy1.jpg' },
-      { name: 'Rashi & Hrithik', video: 'nR64RseSB6U', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy2.jpg' },
-      { name: 'Kritika & Karan',  video: 'Xz-x7G-vy54', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/dreamy3.jpg' },
+      { name: 'Gurjot & Mrityunjay', video: '_oA97qdJoGM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781423357/st1.jpg' },
+      { name: 'Ashita & Nitesh',     video: 'neKxzaCp1W0', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781423428/st2.jpg' },
+      { name: 'Ishita & Kratu',      video: 'H_bu5yJtEMo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781424307/st3.jpg' },
     ],
   },
 };

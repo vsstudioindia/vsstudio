@@ -347,7 +347,7 @@ export default function RecordPlayer() {
     }, 16);
   }
 
-  const mood = MOODS[activeMood];
+  const mood = MOODS[activeMood] ?? MOODS.cinematic;
 
   return (
     <>

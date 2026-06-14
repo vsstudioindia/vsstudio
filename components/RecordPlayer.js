@@ -34,7 +34,7 @@ const MOODS = {
     ],
   },
   storytelling: {
-    label: 'Story-telling', word: 'dream.',
+    label: 'Story-telling', word: 'dream.', grid6: true,
     ac: '#3a9088', rgb: '58,144,136',
     lO: '#041412', lI: '#175850', lF: '#b8f0ec', lT: 'STORY-TELLING',
     audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518675/ambient-dreamy.wav',
@@ -523,8 +523,8 @@ export default function RecordPlayer() {
           {/* Album cards */}
           <div style={{
             position:      'relative',
-            height:        isMobile ? 'auto' : mood.couples.length > 3 ? 'clamp(360px,42vh,400px)' : 'clamp(240px,30vh,340px)',
-            minWidth:      isMobile ? 'auto' : mood.couples.length > 3 ? '580px' : 'auto',
+            height:        isMobile ? 'auto' : (mood.couples.length > 3 || mood.grid6) ? 'clamp(360px,42vh,400px)' : 'clamp(240px,30vh,340px)',
+            minWidth:      isMobile ? 'auto' : (mood.couples.length > 3 || mood.grid6) ? '580px' : 'auto',
             overflow:      'visible',
             flexShrink:    0,
             display:       isMobile ? 'flex' : 'block',
@@ -532,7 +532,7 @@ export default function RecordPlayer() {
             gap:           isMobile ? '10px' : '0',
           }}>
             {mood.couples.map((couple, i) => {
-              const cfg = mood.couples.length > 3 ? CARD_CONFIG_6[i] : CARD_CONFIG[i];
+              const cfg = (mood.couples.length > 3 || mood.grid6) ? CARD_CONFIG_6[i] : CARD_CONFIG[i];
               return (
               <AlbumCard
                 key={`${activeMood}-${i}`}

@@ -25,7 +25,7 @@ const MOODS = {
     lO: '#1a0a02', lI: '#7a3010', lF: '#ffd4b8', lT: 'FUN & CRAZY',
     audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518580/ambient-crazy.wav',
     couples: [
-      { name: 'Yashna & Khussh',             video: '8v1B5A3x6xM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy1.jpg' },
+      { name: 'Yashna & Khussh',             video: 'rSeB8wjhEF8', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy1.jpg' },
       { name: 'Sakshi & Shubham',             video: 'lwnDJSNwsbg',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy2.jpg' },
       { name: 'Anissa — Haldi',               video: '7Lz_YJpWIpA',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy3.jpg' },
       { name: 'Shristy & Shreyansh',          video: 'KWm_8qURa1c',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781421547/crazy4.jpg' },

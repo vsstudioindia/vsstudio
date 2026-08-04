@@ -13,7 +13,7 @@ export const metadata = {
     url: 'https://pitch.vsstudio.in',
     images: [
       {
-        url: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779744741/logo_reverse.png',
+        url: '/opengraph-image.png',
         width: 1200,
         height: 630,
       }

@@ -294,20 +294,44 @@ export default function WhyUs() {
           }}
         >
           {/* Left — headline */}
-          <h2
-            style={{
-              fontFamily:  "'Cormorant Garamond', serif",
-              fontSize:    'clamp(38px, 4.5vw, 68px)',
-              fontWeight:  200,
-              lineHeight:  1.05,
-              color:       'var(--ivory)',
-              margin:      0,
-              whiteSpace:  'nowrap',
-            }}
-          >
-            Why <em style={{ color: '#c9a84c', fontStyle: 'italic' }}>You</em> Should Choose <em style={{ color: '#c9a84c', fontStyle: 'italic' }}>Us</em>.
-          </h2>
-
+         {/* Left — headline */}
+<h2
+  style={{
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: isMobile
+      ? '40px'
+      : 'clamp(38px, 4.5vw, 68px)',
+    fontWeight: 200,
+    lineHeight: 1.05,
+    color: 'var(--ivory)',
+    margin: 0,
+    whiteSpace: isMobile
+      ? 'normal'
+      : 'nowrap',
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
+  }}
+>
+  Why{' '}
+  <em
+    style={{
+      color: '#c9a84c',
+      fontStyle: 'italic',
+    }}
+  >
+    You
+  </em>{' '}
+  Should Choose{' '}
+  <em
+    style={{
+      color: '#c9a84c',
+      fontStyle: 'italic',
+    }}
+  >
+    Us
+  </em>
+  .
+</h2>
           {/* Right — premise + CTA */}
           <div>
             <p

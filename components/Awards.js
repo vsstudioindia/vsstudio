@@ -1,6 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
-import { useMobile } from '../lib/useMobile';
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -43,13 +40,11 @@ function LogoItem({ src, alt }) {
 }
 
 export default function Awards() {
-  const isMobile = useMobile();
-
   const sectionRef = useRef(null);
   const trackRef   = useRef(null);
   const [visible, setVisible] = useState(false);
   const [paused,  setPaused]  = useState(false);
-  
+
   useEffect(() => {
     const sec = sectionRef.current;
     if (!sec) return;
@@ -70,19 +65,18 @@ export default function Awards() {
         }
       `}</style>
 
-     <section
-  id="awards"
-  ref={sectionRef}
-  style={{
-    display:     isMobile ? 'none' : 'block',
-    background:  '#060606',
-    padding:     '100px 0 110px',
-    overflow:    'hidden',
-    opacity:     visible ? 1 : 0,
-    transform:   visible ? 'translateY(0)' : 'translateY(20px)',
-    transition:  'opacity 0.8s ease, transform 0.8s ease',
-  }}
->
+      <section
+        id="awards"
+        ref={sectionRef}
+        style={{
+          background:  '#060606',
+          padding:     '100px 0 110px',
+          overflow:    'hidden',
+          opacity:     visible ? 1 : 0,
+          transform:   visible ? 'translateY(0)' : 'translateY(20px)',
+          transition:  'opacity 0.8s ease, transform 0.8s ease',
+        }}
+      >
         {/* Header */}
         <div style={{ padding: '0 56px 56px' }}>
           <h2

@@ -1018,7 +1018,7 @@ export default function Sphere() {
               marginBottom:
                 '28px',
               overflowX:
-                'auto',
+                'hidden',
               scrollbarWidth:
                 'none',
             }}

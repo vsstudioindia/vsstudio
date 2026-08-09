@@ -977,12 +977,14 @@ export default function Sphere() {
         ═══════════════════════════════════════ */
 
         <>
-          <div
-            style={{
-              padding:
-                '0 24px 20px',
-            }}
-          >
+         <div
+  style={{
+    padding: '0 20px 64px',
+    width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden',
+  }}
+>
             <p
               style={{
                 fontFamily:

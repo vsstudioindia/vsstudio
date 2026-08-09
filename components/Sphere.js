@@ -1101,7 +1101,7 @@ export default function Sphere() {
                   'relative',
                 width: '100%',
                 aspectRatio:
-                  '4 / 5',
+                  '16 / 10',
                 overflow:
                   'hidden',
                 background:
@@ -1127,16 +1127,13 @@ export default function Sphere() {
                 draggable={false}
                 loading="eager"
                 decoding="async"
-                style={{
-                  display:
-                    'block',
-                  width:
-                    '100%',
-                  height:
-                    '100%',
-                  objectFit:
-                    'cover',
-                }}
+             style={{
+  display: 'block',
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+  background: '#111',
+}}
               />
 
               <div

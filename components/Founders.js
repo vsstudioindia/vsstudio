@@ -203,7 +203,7 @@ export default function Founders() {
       >
         {/* Banner photo with slow zoom */}
         <img
-          src="https://res.cloudinary.com/drn6x6hbd/image/upload/founders-banner"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1600,c_limit/founders-banner"
           alt="VS Studio Founders"
           style={{
             position:   'absolute',
@@ -361,7 +361,7 @@ export default function Founders() {
         }}
       >
         <FounderCard
-          src="https://res.cloudinary.com/drn6x6hbd/image/upload/vrinda"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1200,c_limit/vrinda"
           role="Co-Founder & Story-teller"
           name="Vrinda Ganeriwala"
           title="Photographer. Story-teller. Canon Wizard."
@@ -370,7 +370,7 @@ export default function Founders() {
           isLast={false}
         />
         <FounderCard
-          src="https://res.cloudinary.com/drn6x6hbd/image/upload/shristi"
+          src="https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1200,c_limit/shristi"
           role="Co-Founder & Creative Director"
           name="Shristi Dhandharia"
           title="Photographer. Creative Director. Canon Wizard."

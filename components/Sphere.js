@@ -5,34 +5,43 @@ import { useMobile } from '../lib/useMobile';
 
 const CDN = 'https://res.cloudinary.com/drn6x6hbd/image/upload/';
 
+const optimizeImage = (path, width = 900) =>
+  `${CDN}f_auto,q_auto,w_${width},c_limit/${path}`;
+
 const CATEGORIES = [
   {
-    key:    'editorial',
-    label:  'Editorial',
+    key: 'editorial',
+    label: 'Editorial',
     images: [
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere1.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere2.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/sphere3.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465743/sphere4.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere5.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465744/sphere6.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465745/sphere7.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere8.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere9.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere10.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere11.jpg',
-      'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465742/sphere12.jpg',
+      optimizeImage('v1779465744/sphere1.jpg'),
+      optimizeImage('v1779465743/sphere2.jpg'),
+      optimizeImage('v1779465741/sphere3.jpg'),
+      optimizeImage('v1779465743/sphere4.jpg'),
+      optimizeImage('v1779465744/sphere5.jpg'),
+      optimizeImage('v1779465744/sphere6.jpg'),
+      optimizeImage('v1779465745/sphere7.jpg'),
+      optimizeImage('v1779465742/sphere8.jpg'),
+      optimizeImage('v1779465742/sphere9.jpg'),
+      optimizeImage('v1779465742/sphere10.jpg'),
+      optimizeImage('v1779465742/sphere11.jpg'),
+      optimizeImage('v1779465742/sphere12.jpg'),
     ],
   },
   {
-    key:    'friends',
-    label:  'Friends & Family',
-    images: Array.from({ length: 12 }, (_, i) => `${CDN}ff${i + 1}.jpg`),
+    key: 'friends',
+    label: 'Friends & Family',
+    images: Array.from(
+      { length: 12 },
+      (_, i) => optimizeImage(`ff${i + 1}.jpg`)
+    ),
   },
   {
-    key:    'storytelling',
-    label:  'Story-telling',
-    images: Array.from({ length: 12 }, (_, i) => `${CDN}story${i + 1}.jpg`),
+    key: 'storytelling',
+    label: 'Story-telling',
+    images: Array.from(
+      { length: 12 },
+      (_, i) => optimizeImage(`story${i + 1}.jpg`)
+    ),
   },
 ];
 

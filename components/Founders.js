@@ -216,27 +216,31 @@ export default function Founders() {
       >
         {/* Banner photo with slow zoom */}
         <img
-          src="https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1600,c_limit/founders-banner"
-          alt="VS Studio Founders"
-          style={{
-            position:   'absolute',
-            inset:      0,
-            width:      '100%',
-            height:     '100%',
-           objectFit: 'cover',
-objectPosition: isMobile
-  ? 'center 28%'
-  : 'center center',
-filter: 'brightness(0.45) saturate(0.7)',
-transform: zoomed
-  ? 'scale(1)'
-  : isMobile
-    ? 'scale(1.01)'
-    : 'scale(1.04)',
-transition: 'transform 8s ease',
-            zIndex:     0,
-          }}
-        />
+  src="https://res.cloudinary.com/drn6x6hbd/image/upload/founders-banner"
+  alt="VS Studio Founders"
+  style={{
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+
+    objectFit: isMobile ? 'contain' : 'cover',
+    objectPosition: 'center center',
+
+    background: '#060606',
+
+    filter: 'brightness(0.45) saturate(0.7)',
+
+    transform: isMobile
+      ? 'scale(1)'
+      : zoomed
+        ? 'scale(1)'
+        : 'scale(1.04)',
+
+    transition: 'transform 8s ease',
+    zIndex: 0,
+  }}
+/>
 
         {/* Gradient 1 — bottom darkening */}
         <div

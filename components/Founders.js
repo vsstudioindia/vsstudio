@@ -105,7 +105,7 @@ function FounderCard({
           bottom:        0,
           left:          0,
           right:         0,
-          padding:       '48px',
+          padding: isMobile ? '20px 14px' : '48px',
           zIndex:        2,
           display:       'flex',
           flexDirection: 'column',
@@ -130,7 +130,9 @@ function FounderCard({
         <h3
           style={{
             fontFamily:  "'Cormorant Garamond', serif",
-            fontSize:    'clamp(28px, 3vw, 44px)',
+            fontSize: isMobile
+  ? '22px'
+  : 'clamp(28px, 3vw, 44px)',
             fontWeight:  300,
             lineHeight:  1.1,
             color:       'var(--ivory)',
@@ -144,7 +146,7 @@ function FounderCard({
         <p
           style={{
             fontFamily:    "'Montserrat', sans-serif",
-            fontSize:      '10px',
+            fontSize: isMobile ? '8px' : '10px',
             fontWeight:    200,
             letterSpacing: '0.12em',
             color:         'var(--ivory)',
@@ -221,10 +223,17 @@ export default function Founders() {
             inset:      0,
             width:      '100%',
             height:     '100%',
-            objectFit:  'cover',
-            filter:     'brightness(0.45) saturate(0.7)',
-            transform:  zoomed ? 'scale(1)' : 'scale(1.04)',
-            transition: 'transform 8s ease',
+           objectFit: 'cover',
+objectPosition: isMobile
+  ? 'center 28%'
+  : 'center center',
+filter: 'brightness(0.45) saturate(0.7)',
+transform: zoomed
+  ? 'scale(1)'
+  : isMobile
+    ? 'scale(1.01)'
+    : 'scale(1.04)',
+transition: 'transform 8s ease',
             zIndex:     0,
           }}
         />
@@ -389,8 +398,8 @@ export default function Founders() {
           badge="Award-Winning Filmmaker"
           isLast={true}
           imgObjectPosition="center 20%"
-          baseScale={1.15}
-          hoverScale={1.19}
+          baseScale={1}
+hoverScale={1.04}
         />
       </div>
     </div>

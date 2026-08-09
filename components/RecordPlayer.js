@@ -4,44 +4,134 @@ import { useEffect, useRef, useState } from 'react';
 import { useMobile } from '../lib/useMobile';
 
 /* ─────────────────────────────── data ────────────────────────────────────── */
+const cloudinaryImage = (path, width = 800) =>
+  `https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_${width},c_limit/${path}`;
+
 const MOODS = {
   cinematic: {
-    label: 'Cinematic', word: 'beat.',
-    ac: '#7a9acc', rgb: '122,154,204',
-    lO: '#0a0f1e', lI: '#3a5080', lF: '#c8d8f8', lT: 'CINEMATIC',
-    audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518316/ambient-cinematic.wav',
+    label: 'Cinematic',
+    word: 'beat.',
+    ac: '#7a9acc',
+    rgb: '122,154,204',
+    lO: '#0a0f1e',
+    lI: '#3a5080',
+    lF: '#c8d8f8',
+    lT: 'CINEMATIC',
+
+    audio:
+      'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518316/ambient-cinematic.wav',
+
     couples: [
-      { name: 'Akshita & Roshan',   video: 'Woa-O8oi6Zo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic1.jpg' },
-      { name: 'Tanishqa & Yash',    video: 'rSQYZdmwiFM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic2.jpg' },
-      { name: 'Simran & Aadish',    video: 'vD2K6CffpGg', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781415460/cinematic3.jpg' },
-      { name: 'Shristy & Umang',    video: 'ZCWoL_Wjt7g', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic4.jpg' },
-      { name: 'Vedika & Shridhar',  video: 'KcicnzeTNEI', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic5.jpg' },
-      { name: 'Divesh & Atulan',    video: 'Q0KLAqOCQKU', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/cinematic6.jpg' },
+      {
+        name: 'Akshita & Roshan',
+        video: 'Woa-O8oi6Zo',
+        img: cloudinaryImage('cinematic1.jpg'),
+      },
+      {
+        name: 'Tanishqa & Yash',
+        video: 'rSQYZdmwiFM',
+        img: cloudinaryImage('cinematic2.jpg'),
+      },
+      {
+        name: 'Simran & Aadish',
+        video: 'vD2K6CffpGg',
+        img: cloudinaryImage('v1781415460/cinematic3.jpg'),
+      },
+      {
+        name: 'Shristy & Umang',
+        video: 'ZCWoL_Wjt7g',
+        img: cloudinaryImage('cinematic4.jpg'),
+      },
+      {
+        name: 'Vedika & Shridhar',
+        video: 'KcicnzeTNEI',
+        img: cloudinaryImage('cinematic5.jpg'),
+      },
+      {
+        name: 'Divesh & Atulan',
+        video: 'Q0KLAqOCQKU',
+        img: cloudinaryImage('cinematic6.jpg'),
+      },
     ],
   },
+
   crazy: {
-    label: 'Fun & Crazy', word: 'energy.',
-    ac: '#c45a20', rgb: '196,90,32',
-    lO: '#1a0a02', lI: '#7a3010', lF: '#ffd4b8', lT: 'FUN & CRAZY',
-    audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518580/ambient-crazy.wav',
+    label: 'Fun & Crazy',
+    word: 'energy.',
+    ac: '#c45a20',
+    rgb: '196,90,32',
+    lO: '#1a0a02',
+    lI: '#7a3010',
+    lF: '#ffd4b8',
+    lT: 'FUN & CRAZY',
+
+    audio:
+      'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518580/ambient-crazy.wav',
+
     couples: [
-      { name: 'Yashna & Khussh',             video: 'rSeB8wjhEF8', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy1.jpg' },
-      { name: 'Sakshi & Shubham',             video: 'lwnDJSNwsbg',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy2.jpg' },
-      { name: 'Anissa — Haldi',               video: '7Lz_YJpWIpA',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy3.jpg' },
-      { name: 'Shristy & Shreyansh',          video: 'KWm_8qURa1c',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781421547/crazy4.jpg' },
-      { name: 'Namita & Vinit — Yacht Party', video: 'yaE4uSnDszo',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/crazy5.jpg' },
-      { name: 'Vidhi & Rishab',               video: 't0zvfeK8-Gs',  img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781421855/crazy6.jpg' },
+      {
+        name: 'Yashna & Khussh',
+        video: 'rSeB8wjhEF8',
+        img: cloudinaryImage('crazy1.jpg'),
+      },
+      {
+        name: 'Sakshi & Shubham',
+        video: 'lwnDJSNwsbg',
+        img: cloudinaryImage('crazy2.jpg'),
+      },
+      {
+        name: 'Anissa — Haldi',
+        video: '7Lz_YJpWIpA',
+        img: cloudinaryImage('crazy3.jpg'),
+      },
+      {
+        name: 'Shristy & Shreyansh',
+        video: 'KWm_8qURa1c',
+        img: cloudinaryImage('v1781421547/crazy4.jpg'),
+      },
+      {
+        name: 'Namita & Vinit — Yacht Party',
+        video: 'yaE4uSnDszo',
+        img: cloudinaryImage('crazy5.jpg'),
+      },
+      {
+        name: 'Vidhi & Rishab',
+        video: 't0zvfeK8-Gs',
+        img: cloudinaryImage('v1781421855/crazy6.jpg'),
+      },
     ],
   },
+
   storytelling: {
-    label: 'Story-telling', word: 'dream.', grid6: true,
-    ac: '#3a9088', rgb: '58,144,136',
-    lO: '#041412', lI: '#175850', lF: '#b8f0ec', lT: 'STORY-TELLING',
-    audio: 'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518675/ambient-dreamy.wav',
+    label: 'Story-telling',
+    word: 'dream.',
+    grid6: true,
+    ac: '#3a9088',
+    rgb: '58,144,136',
+    lO: '#041412',
+    lI: '#175850',
+    lF: '#b8f0ec',
+    lT: 'STORY-TELLING',
+
+    audio:
+      'https://res.cloudinary.com/drn6x6hbd/video/upload/v1779518675/ambient-dreamy.wav',
+
     couples: [
-      { name: 'Gurjot & Mrityunjay', video: '_oA97qdJoGM', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781423357/st1.jpg' },
-      { name: 'Ashita & Nitesh',     video: 'neKxzaCp1W0', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781423428/st2.jpg' },
-      { name: 'Ishita & Kratu',      video: 'H_bu5yJtEMo', img: 'https://res.cloudinary.com/drn6x6hbd/image/upload/v1781424307/st3.jpg' },
+      {
+        name: 'Gurjot & Mrityunjay',
+        video: '_oA97qdJoGM',
+        img: cloudinaryImage('v1781423357/st1.jpg'),
+      },
+      {
+        name: 'Ashita & Nitesh',
+        video: 'neKxzaCp1W0',
+        img: cloudinaryImage('v1781423428/st2.jpg'),
+      },
+      {
+        name: 'Ishita & Kratu',
+        video: 'H_bu5yJtEMo',
+        img: cloudinaryImage('v1781424307/st3.jpg'),
+      },
     ],
   },
 };

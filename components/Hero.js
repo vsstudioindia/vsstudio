@@ -8,12 +8,12 @@ const PAR_X = 16;
 const PAR_Y = 9;
 
 const IMAGES = [
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero1',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/gallery5.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero2',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1779465741/gallery1.jpg',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/hero3',
-  'https://res.cloudinary.com/drn6x6hbd/image/upload/v1780638816/hero4.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/hero1',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/v1779465741/gallery5.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/hero2',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/v1779465741/gallery1.jpg',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/hero3',
+  'https://res.cloudinary.com/drn6x6hbd/image/upload/f_auto,q_auto,w_1920,c_limit/v1780638816/hero4.jpg',
 ];
 
 export default function Hero() {

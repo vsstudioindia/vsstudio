@@ -198,10 +198,12 @@ export default function Nav() {
               href={href}
               onClick={() => setMenuOpen(false)}
               style={{
-                fontFamily:     "'Cormorant Garamond', serif",
-                fontSize:       'clamp(2rem, 9vw, 3.5rem)',
-                fontWeight:     300,
-                fontStyle:      'italic',
+                fontFamily: "'Montserrat', sans-serif",
+                fontSize: 'clamp(1.8rem, 8vw, 3rem)',
+                fontWeight: 300,
+                fontStyle: 'normal',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
                 color:          'var(--ivory)',
                 textDecoration: 'none',
                 opacity:        menuOpen ? 1 : 0,

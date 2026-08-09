@@ -199,7 +199,7 @@ export default function Nav() {
               onClick={() => setMenuOpen(false)}
               style={{
                 fontFamily: "'Montserrat', sans-serif",
-                fontSize: 'clamp(1.8rem, 8vw, 3rem)',
+                fontSize: 'clamp(1.35rem, 6vw, 2rem)',
                 fontWeight: 300,
                 fontStyle: 'normal',
                 letterSpacing: '0.08em',

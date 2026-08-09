@@ -122,16 +122,23 @@ function ValueCard({ num, title, body, tag, revealDelay }) {
       </p>
 
       {/* Title */}
-      <h3
-        style={{
-          fontFamily:   "'Cormorant Garamond', serif",
-          fontSize:     '21px',
-          fontWeight:   400,
-          color:        'var(--ivory)',
-          marginBottom: '14px',
-          lineHeight:   1.2,
-        }}
-      >
+      <h2
+  style={{
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: isMobile
+      ? '40px'
+      : 'clamp(38px, 4.5vw, 68px)',
+    fontWeight: 200,
+    lineHeight: 1.05,
+    color: 'var(--ivory)',
+    margin: 0,
+    whiteSpace: isMobile
+      ? 'normal'
+      : 'nowrap',
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
+  }}
+>
         {title}
       </h3>
 

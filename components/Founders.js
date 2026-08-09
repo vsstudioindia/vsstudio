@@ -21,10 +21,19 @@ function useReveal(threshold = 0.12) {
 }
 
 /* ── Founder card ────────────────────────────────────────────────────────── */
-function FounderCard({ src, role, name, title, bio, badge, isLast,
-                        imgObjectPosition = 'top center',
-                        baseScale = 1,
-                        hoverScale = 1.04 }) {
+function FounderCard({
+  src,
+  role,
+  name,
+  title,
+  bio,
+  badge,
+  isLast,
+  isMobile,
+  imgObjectPosition = 'top center',
+  baseScale = 1,
+  hoverScale = 1.04,
+}) {
   const [hovered, setHovered] = useState(false);
   const [ref, visible] = useReveal(0.1);
 
@@ -35,7 +44,9 @@ function FounderCard({ src, role, name, title, bio, badge, isLast,
       onMouseLeave={() => setHovered(false)}
       style={{
         position:   'relative',
-        height:     'clamp(420px, 70vw, 700px)',
+        height: isMobile
+  ? '460px'
+  : 'clamp(420px, 70vw, 700px)',
         overflow:   'hidden',
         opacity:    visible ? 1 : 0,
         transform:  visible ? 'translateY(0)' : 'translateY(32px)',
@@ -355,7 +366,7 @@ export default function Founders() {
         ref={cardsRef}
         style={{
           display:             'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gridTemplateColumns: '1fr 1fr',
           opacity:             cardsVisible ? 1 : 0,
           transition:          'opacity 0.6s ease',
         }}

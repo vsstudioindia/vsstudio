@@ -59,6 +59,8 @@ export default function Canon() {
   }
 
   useEffect(() => {
+    if (isMobile) return;
+
     goToVid(0);
 
     function onResize() {
@@ -77,7 +79,7 @@ export default function Canon() {
       clearTimeout(timerRef.current);
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <>
@@ -141,7 +143,8 @@ export default function Canon() {
 
       <section id="canon" ref={sectionRef}>
 
-        {/* ══ LEFT — VIDEOS ═══════════════════════════════════════════════ */}
+        {/* ══ MOBILE / DESKTOP VIDEO AREA ═══════════════════════════════ */}
+
         <div
           style={{
             position: 'relative',
@@ -150,7 +153,6 @@ export default function Canon() {
           }}
         >
 
-          {/* Sliding track */}
           <div
             ref={trackRef}
             style={{
@@ -163,7 +165,7 @@ export default function Canon() {
             }}
           >
 
-            {VIDEOS.map((vid, i) => (
+            {(isMobile ? [VIDEOS[0]] : VIDEOS).map((vid, i) => (
               <div
                 key={i}
                 style={{
@@ -174,7 +176,6 @@ export default function Canon() {
                 }}
               >
 
-                {/* YouTube video */}
                 <iframe
                   src={vid.src}
                   allow="autoplay; encrypted-media"
@@ -183,134 +184,130 @@ export default function Canon() {
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
-
-                    /*
-                     * DESKTOP
-                     * Landscape video fills the viewport.
-                     *
-                     * MOBILE
-                     * Make the iframe wider than the portrait viewport
-                     * so the landscape footage is intentionally cropped
-                     * into a 9:16 composition.
-                     */
                     width: isMobile ? '177.78%' : '100%',
                     height: isMobile ? '100%' : '177.78%',
-
-                    transform:
-                      'translate(-50%, -50%)',
-
+                    transform: 'translate(-50%, -50%)',
                     border: 'none',
                     pointerEvents: 'none',
                   }}
                 />
 
                 {/* Dark overlay */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.45)',
-                    opacity: activeIdx === i ? 0 : 1,
-                    transition: 'opacity 0.6s ease',
-                    zIndex: 2,
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                {/* Video label */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: isMobile ? '24px' : '32px',
-                    left: isMobile ? '24px' : '32px',
-                    zIndex: 3,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <p
+                {!isMobile && (
+                  <div
                     style={{
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontSize: '7px',
-                      letterSpacing: '0.35em',
-                      textTransform: 'uppercase',
-                      color: '#c9a84c',
-                      opacity: 0.55,
-                      marginBottom: '6px',
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.45)',
+                      opacity: activeIdx === i ? 0 : 1,
+                      transition: 'opacity 0.6s ease',
+                      zIndex: 2,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+
+                {/* Desktop video label ONLY */}
+                {!isMobile && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '32px',
+                      left: '32px',
+                      zIndex: 3,
+                      pointerEvents: 'none',
                     }}
                   >
-                    Canon India
-                  </p>
+                    <p
+                      style={{
+                        fontFamily: "'Montserrat', sans-serif",
+                        fontSize: '7px',
+                        letterSpacing: '0.35em',
+                        textTransform: 'uppercase',
+                        color: '#c9a84c',
+                        opacity: 0.55,
+                        marginBottom: '6px',
+                      }}
+                    >
+                      Canon India
+                    </p>
 
-                  <p
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontStyle: 'italic',
-                      fontSize: isMobile ? '18px' : '15px',
-                      fontWeight: 300,
-                      color: '#f0ead8',
-                      opacity: 0.75,
+                    <p
+                      style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontStyle: 'italic',
+                        fontSize: '15px',
+                        fontWeight: 300,
+                        color: '#f0ead8',
+                        opacity: 0.75,
+                      }}
+                    >
+                      {vid.name}
+                    </p>
+                  </div>
+                )}
+
+                {/* Desktop progress bar ONLY */}
+                {!isMobile && (
+                  <div
+                    ref={(el) => {
+                      progressRefs.current[i] = el;
                     }}
-                  >
-                    {vid.name}
-                  </p>
-                </div>
-
-                {/* Progress bar */}
-                <div
-                  ref={(el) => {
-                    progressRefs.current[i] = el;
-                  }}
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 0,
-                    width: '2px',
-                    height: '0%',
-                    background: 'var(--gold)',
-                    opacity: 0.6,
-                    zIndex: 3,
-                  }}
-                />
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 0,
+                      width: '2px',
+                      height: '0%',
+                      background: 'var(--gold)',
+                      opacity: 0.6,
+                      zIndex: 3,
+                    }}
+                  />
+                )}
 
               </div>
             ))}
 
           </div>
 
-          {/* Nav dots */}
-          <div
-            style={{
-              position: 'absolute',
-              right: isMobile ? '12px' : '16px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              zIndex: 10,
-              pointerEvents: 'none',
-            }}
-          >
-            {VIDEOS.map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: '5px',
-                  height: '5px',
-                  borderRadius: '50%',
-                  background:
-                    activeIdx === i
-                      ? 'var(--gold)'
-                      : 'rgba(201,168,76,0.25)',
-                  transition: 'background 0.4s ease',
-                }}
-              />
-            ))}
-          </div>
+          {/* Desktop navigation dots ONLY */}
+          {!isMobile && (
+            <div
+              style={{
+                position: 'absolute',
+                right: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
+            >
+              {VIDEOS.map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    background:
+                      activeIdx === i
+                        ? 'var(--gold)'
+                        : 'rgba(201,168,76,0.25)',
+                    transition: 'background 0.4s ease',
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
         </div>
 
         {/* ══ RIGHT — TEXT ═══════════════════════════════════════════════ */}
+
         <div
           className="canon-right"
           style={{
@@ -344,7 +341,7 @@ export default function Canon() {
               fontWeight: 200,
               fontSize: isMobile
                 ? 'clamp(48px, 14vw, 72px)'
-                : 'clamp(56px,6vw,92px)',
+                : 'clamp(56px, 6vw, 92px)',
               lineHeight: 0.95,
               marginBottom: '36px',
               color: 'var(--ivory)',

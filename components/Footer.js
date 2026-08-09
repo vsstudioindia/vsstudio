@@ -1,24 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { useMobile } from '../lib/useMobile';
 
 const RIGHT_LINKS = [
   { label: 'Instagram', href: 'https://instagram.com/vs.studio' },
-  { label: 'Contact',   href: 'https://wa.link/xt8mtl'          },
+  { label: 'Contact',   href: 'https://wa.link/xt8mtl' },
 ];
 
 export default function Footer() {
   const [hovered, setHovered] = useState(null);
+  const isMobile = useMobile();
 
   return (
     <footer
       style={{
-        padding:        '44px 56px',
+        padding:        isMobile ? '40px 24px' : '44px 56px',
         borderTop:      '1px solid rgba(201,168,76,0.07)',
         display:        'flex',
+        flexDirection:  isMobile ? 'column' : 'row',
         justifyContent: 'space-between',
         alignItems:     'center',
+        gap:            isMobile ? '24px' : '0',
         background:     'var(--black)',
+        textAlign:      'center',
       }}
     >
       {/* Left — wordmark */}
@@ -31,6 +36,7 @@ export default function Footer() {
           textTransform: 'uppercase',
           color:         'var(--gold)',
           opacity:       0.55,
+          margin:        0,
         }}
       >
         VS Studio
@@ -45,13 +51,21 @@ export default function Footer() {
           letterSpacing: '0.12em',
           color:         'var(--ivory)',
           opacity:       0.18,
+          margin:        0,
         }}
       >
         © 2026 VS Studio. All rights reserved.
       </p>
 
       {/* Right — nav links */}
-      <nav style={{ display: 'flex', gap: '28px' }}>
+      <nav
+        style={{
+          display:       'flex',
+          gap:            '28px',
+          justifyContent: 'center',
+          alignItems:    'center',
+        }}
+      >
         {RIGHT_LINKS.map(({ label, href }) => (
           <a
             key={label}

@@ -204,11 +204,12 @@ export default function Founders() {
       {/* ══ PART 1 — Full-height banner ══════════════════════════════════ */}
       <section
         ref={bannerRef}
-        className="min-h-dvh"
+        className={isMobile ? '' : 'min-h-dvh'}
         style={{
           position:   'relative',
           overflow:   'hidden',
           display:    'flex',
+          minHeight: isMobile ? '72vw' : undefined,
           alignItems: 'flex-end',
           opacity:    bannerVisible ? 1 : 0,
           transition: 'opacity 1.2s ease',

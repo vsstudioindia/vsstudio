@@ -730,29 +730,34 @@ export default function RecordPlayer() {
   }
 
   function handleMuteToggle() {
-    const el =
-      audioRef.current;
+  const el = audioRef.current;
+  if (!el) return;
 
-    if (!el) return;
+  if (isMuted) {
+    // UNMUTE
+    isMutedRef.current = false;
+    setIsMuted(false);
 
-    if (isMuted) {
-      isMutedRef.current =
-        false;
+    el.muted = false;
+    el.volume = getVisibility() * 0.28;
 
-      setIsMuted(false);
-
-      el.volume =
-        getVisibility() *
-        0.28;
-    } else {
-      isMutedRef.current =
-        true;
-
-      setIsMuted(true);
-
-      el.volume = 0;
+    // Important for mobile:
+    // tapping the button counts as user interaction,
+    // so we can safely start the audio here.
+    if (el.paused) {
+      el.play().catch((err) => {
+        console.log('Audio could not start:', err);
+      });
     }
+  } else {
+    // MUTE
+    isMutedRef.current = true;
+    setIsMuted(true);
+
+    el.muted = true;
+    el.volume = 0;
   }
+}
 
   function openLightbox(
     video,

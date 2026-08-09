@@ -77,7 +77,7 @@ export default function Statement() {
           zIndex:         0,
         }}
       >
-        <source src="https://res.cloudinary.com/drn6x6hbd/video/upload/story" type="video/mp4" />
+        <source src="https://res.cloudinary.com/drn6x6hbd/video/upload/q_auto,f_auto/story" type="video/mp4" />
       </video>
 
       {/* Dark overlay */}
